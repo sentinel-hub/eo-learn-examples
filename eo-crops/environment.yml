@@ -1,0 +1,14 @@
+name: eo-crops
+channels:
+  - conda-forge
+dependencies:
+  - python=3.7
+  - pip
+  - gdal
+  - pip :
+    - eo-learn>=0.10.1
+    - sentinelhub>=3.4.2
+    - -r requirements.txt
+
+
+
