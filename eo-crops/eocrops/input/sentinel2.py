@@ -4,18 +4,17 @@ import eolearn.mask
 import eolearn.features
 import eolearn
 
-from sentinelhub import  DataCollection
+from sentinelhub import DataCollection
 from eolearn.core import SaveTask, FeatureType
-from eolearn.io import  SentinelHubDemTask, SentinelHubEvalscriptTask
+from eolearn.io import SentinelHubDemTask, SentinelHubEvalscriptTask
 import datetime
 
 from eolearn.core import OverwritePermission
 
 import eocrops.tasks.preprocessing as preprocessing
 import os
-from  eocrops.utils import utils as utils
+from eocrops.utils import utils as utils
 import multiprocessing
-
 
 import eocrops.tasks.vegetation_indices as vegetation_indices
 import eocrops.input.utils_sh as utils_sh
@@ -27,7 +26,7 @@ def workflow_instructions_S2L2A(config,
                                 path_out=None,
                                 polygon=None,
                                 interpolation=None,
-                                n_threads=multiprocessing.cpu_count()-1):
+                                n_threads=multiprocessing.cpu_count() - 1):
     ''' Define the request of image from sentinelhb API by defining the bbox of the field, the time period and the output desired (evalscript)
     Sentinel-2 L2a product, available from 2017 with 5 days revisit and 10 meters resolution
     Inputs :
@@ -40,8 +39,8 @@ def workflow_instructions_S2L2A(config,
         - n_threads (int) : number of threads to download satellite images
     '''
 
-    if interpolation is None :
-        interpolation = {'interpolate' : False, 'period_length' : None}
+    if interpolation is None:
+        interpolation = {'interpolate': False, 'period_length': None}
 
     # Request format to download Landsat8 L2A products
     time_difference = datetime.timedelta(hours=2)
@@ -106,35 +105,31 @@ def workflow_instructions_S2L2A(config,
                                                              utils_sh.ValidDataCoveragePredicate(coverage_predicate))
 
     vis = vegetation_indices.VegetationIndicesS2('BANDS-S2-L2A',
-                                                       mask_data=bool(1-interpolation['interpolate']))
+                                                 mask_data=bool(1 - interpolation['interpolate']))
 
     norm = vegetation_indices.EuclideanNorm('ECNorm', 'BANDS-S2-L2A')
 
     if path_out is None:
         save = utils_sh.EmptyTask()
     else:
-        if not os.path.isdir(path_out) :
+        if not os.path.isdir(path_out):
             os.makedirs(path_out)
         save = SaveTask(path_out, overwrite_permission=OverwritePermission.OVERWRITE_PATCH)
 
-    if 'period_length' in interpolation.keys():
-        if interpolation['period_length'] is not None:
-            resampled_range = (time_stamp[0], time_stamp[1], interpolation['period_length'])
-    else:
-        resampled_range = None
-
-    copy_features = [(FeatureType.MASK, 'CLM'),
-                     (FeatureType.DATA_TIMELESS, 'DEM'),
-                     (FeatureType.MASK_TIMELESS, 'MASK')]
-
-
-    if interpolation['interpolate'] :
-        # Interpolate pixels cloudy
-        linear_interp = preprocessing.InterpolateFeatures(resampled_range = resampled_range,
-                                                          copy_features=copy_features)
-
-    else :
+    if not interpolation['interpolate']:
         linear_interp = utils_sh.EmptyTask()
+
+    else:
+        if 'period_length' not in interpolation.keys():
+            resampled_range = None
+        elif interpolation['period_length'] is not None:
+            resampled_range = (time_stamp[0], time_stamp[1], interpolation['period_length'])
+
+        copy_features = [(FeatureType.MASK, 'CLM'),
+                         (FeatureType.DATA_TIMELESS, 'DEM'),
+                         (FeatureType.MASK_TIMELESS, 'MASK')]
+        linear_interp = preprocessing.InterpolateFeatures(resampled_range=resampled_range,
+                                                          copy_features=copy_features)
 
     workflow = eolearn.core.LinearWorkflow(input_task,
                                            cloud_mask, add_valid_mask,
@@ -146,9 +141,6 @@ def workflow_instructions_S2L2A(config,
                                            save)
 
     result = workflow.execute({
-        input_task : {'bbox' : field_bbox, 'time_interval' : time_stamp}
+        input_task: {'bbox': field_bbox, 'time_interval': time_stamp}
     })
     return result.eopatch()
-
-
-
