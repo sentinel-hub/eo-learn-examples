@@ -41,7 +41,7 @@ We will soon publish blog-posts to detail both the training and inference proced
 
 ## Acknowledgements
 
-Project funded by [ESA](https://www.esa.int/About_Us/ESRIN) through the QueryPlanet 4000124792/18/I-BG grant.
+Project funded by [ESA](https://www.esa.int/About_Us/ESRIN) [Philab](https://philab.phi.esa.int/) through the QueryPlanet 4000124792/18/I-BG grant.
 
 ## Questions
 
