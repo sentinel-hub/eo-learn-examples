@@ -4,7 +4,7 @@ Repository to showcase the hierarchical building detection code available at [se
 
 The code in the `HiectorInference.ipynb` notebook allows to execute building detection at large scale using multi-scale satellite imagery. In this example, Sentinel-2, Airbus SPOT and Airbus Pleiades imagery will be used to detect buildings in Dakar, Senegal.
 
-Pre-trained models and labels are open-source and available on the AWS S3 bucket [queryplanet.sentinel-hub.com](http://queryplanet.sentinel-hub.com/index.html). The results shown in the notebook are exemplary and are obtained with models fine-tuned on the small sample of manually validated building footprints.
+Pre-trained models and labels are open-source and available on the AWS S3 bucket [queryplanet.sentinel-hub.com](http://queryplanet.sentinel-hub.com/index.html). The results shown in the notebook are exemplary and are obtained with models fine-tuned on the small sample of manually validated building footprints. The models are released under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) license, while the `hiector` code is available under [MIT](https://opensource.org/licenses/MIT) license.
 
 ## Overview
 
