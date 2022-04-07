@@ -13,8 +13,8 @@ The code in the `forest-map.ipynb` notebook allows executing forest segmentation
 The `forest-map.ipynb` notebook demonstrates all steps required to perform a large-scale forest type mapping with machine learning. The notebook consists of three parts. First, it will focus mainly on acquiring satellite data from SentinelHub. It then covers the inference part with the eo-learn library and a pre-trained model from [Vision Impulse GmbH](https://www.vision-impulse.com/). Finally, the notebook demonstrates how to perform inference with a model over a selected AOI using eo-learn.
 
 <p align="center">
-<img height="350" src="/Users/benni/VI-Projects/eo-learn-examples/forest-map/figs/example_aoi_s2.png" width="350"/>
-<img height="350" src="/Users/benni/VI-Projects/eo-learn-examples/forest-map/figs/example_aoi_prediction.png" width="350"/>
+<img height="350" src="./figs/example_aoi_s2.png" width="350"/>
+<img height="350" src="./figs/example_aoi_prediction.png" width="350"/>
 </p>
 
 
@@ -22,13 +22,15 @@ The `forest-map.ipynb` notebook demonstrates all steps required to perform a lar
 
 A pre-trained model is open-sourced and available on the AWS S3 bucket [queryplanet.sentinel-hub.com](http://queryplanet.sentinel-hub.com/index.html). The results shown in the notebook are exemplary and are obtained with models fine-tuned on a subset of the dataset. The models are released under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) license.
 
-
-
 ## Requirements
 
 Before running the notebook, make sure to install the requirements with `pip install -r requirements.txt`.
 
 You need a Sentinel Hub account to run the example notebook, which you can get [here](https://services.sentinel-hub.com/oauth/subscription). Free trial accounts are available.
+
+## How-to run
+
+When everything is set up, you can start the notebook with `jupyter notebook forest-map.ipynb`.
 
 ## Acknowledgements
 
