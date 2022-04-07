@@ -98,7 +98,6 @@ pyparsing==3.0.7
 pyproj==3.2.1
 pyrsistent==0.18.1
 python-dateutil==2.8.2
-python-graphviz==0.19.1
 pytz==2021.3
 pywavelets==1.2.0
 pyyaml==6.0
@@ -124,6 +123,7 @@ thunder-python==1.4.2
 thunder-registration==1.0.1
 tifffile==2021.11.2
 tornado==6.1
+torch==1.10.1
 tqdm==4.62.3
 traitlets==5.1.1
 typing-extensions==4.1.1
