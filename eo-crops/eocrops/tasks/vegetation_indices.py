@@ -309,7 +309,8 @@ class VegetationIndicesS2(EOTask) :
         eopatch.add_feature(FeatureType.DATA, "LAI", self.LAI[..., np.newaxis])
         eopatch.add_feature(FeatureType.DATA, "Cab", self.Cab[..., np.newaxis])
         eopatch.add_feature(FeatureType.DATA, "NDVI", self.NDVI[..., np.newaxis])
-        eopatch.add_feature(FeatureType.DATA, "NDWI", self.EVI2[..., np.newaxis])
+        eopatch.add_feature(FeatureType.DATA, "NDWI", self.NDWI[..., np.newaxis])
+        eopatch.add_feature(FeatureType.DATA, "GNDVI", self.GNDVI[..., np.newaxis])
         eopatch.remove_feature(FeatureType.DATA, "ILLUMINATION")
 
         return eopatch

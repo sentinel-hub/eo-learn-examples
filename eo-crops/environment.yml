@@ -6,9 +6,16 @@ dependencies:
   - pip
   - gdal
   - pip :
-    - eo-learn>=0.10.1
-    - sentinelhub>=3.4.2
-    - -r requirements.txt
+      - eo-learn-coregistration==0.10.1
+      - eo-learn-features==0.10.1
+      - eo-learn-mask==0.10.1
+      - eo-learn-visualization==0.10.1
+      - eo-learn-ml-tools==0.10.1
+      - eo-learn-core==0.10.1
+      - eo-learn-io==0.10.1
+      - eo-learn-geometry==0.10.1
+      - sentinelhub==3.4.2
+      - -r requirements.txt
 
 
 

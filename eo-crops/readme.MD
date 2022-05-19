@@ -1,10 +1,11 @@
 Earth observations for crop monitoring. 
 
-Small python module that gathers awesome functionalities from Sentinelhub, eo-learn python package and OrfeoToolBox for basics download and data processing.
+
+Small python module that brings together awesome functionality from Sentinelhub, eo-learn python package and OrfeoToolBox for basic downloading and data processing.
 
 # Installation
 
-To install the package, you need first to clone the git repository into a desired folder
+To install the package, you must first clone the git repository to the desired folder
 
 ```bash
 git clone git@github.com:j-desloires/eo-crops.git

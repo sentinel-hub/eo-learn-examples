@@ -13,6 +13,7 @@ from sentinelhub import (
 )
 
 import eocrops.tasks.vegetation_indices as vegetation_indices
+
 from eolearn.io import  SentinelHubEvalscriptTask
 
 import datetime as dt
