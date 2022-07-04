@@ -319,7 +319,7 @@ class DownloadVHRSSentinelHub :
         if jobStatus=="RUNNING" :
             time.sleep(2)  # pause to let query ingested
 
-        self.order = True
+        self.running = True
 
         return order_id, order['collectionId']
 

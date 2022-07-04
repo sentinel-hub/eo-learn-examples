@@ -110,14 +110,15 @@ class MultitempSpeckleFiltering(EOTask):
                 meta['dtype'] = 'float32'
 
             meta['count'] = len(times)
-            path_tif = outfiles[0].split('_2017')[0] + '.tif'
+            year = str(eopatch.timestamp[0].year)
+            path_tif = outfiles[0].split('_' + year)[0] + '.tif'
             if 'outcore_filtered.tif' in os.listdir(outdir):
                 outfiles.remove(os.path.join(outdir, 'outcore_filtered.tif'))
             outfiles.sort()
 
-            with rasterio.open(path_tif, 'w', **meta) as dst:
+            with rasterio.open(os.path.join(os.getcwd(), path_tif), 'w', **meta) as dst:
                 for i in range(1, len(times) + 1):
-                    img = gdal.Open(outfiles[i - 1]).ReadAsArray()
+                    img = gdal.Open(os.path.join(os.getcwd(), outfiles[i - 1])).ReadAsArray()
                     dst.write_band(i, img)
 
             import_tif = ImportFromTiffTask((FeatureType.DATA, pol + '_filtered'), path_tif)

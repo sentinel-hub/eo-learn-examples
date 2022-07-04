@@ -117,15 +117,12 @@ class MaskPixels(EOTask):
 
 
 class InterpolateFeatures(EOTask):
-    def __init__(self, resampled_range, algorithm = 'linear', copy_features = None,
-                 features = None):
+    def __init__(self, resampled_range, features,
+                 algorithm = 'linear', copy_features = None):
         self.resampled_range = resampled_range
-        self.algorithm = algorithm
         self.features = features
+        self.algorithm = algorithm
         self.copy_features = copy_features
-        if self.features is None :
-            self.features = ['BANDS-S2-L2A', 'fapar', 'LAI', 'Cab', 'NDVI', 'EVI2', 'CVI', 'NDWI', 'GNDVI', 'GVMI',
-                             'SLAVI', 'NDDI', 'VSDI', 'ECNorm']
 
     def _interpolate_feature(self, eopatch, feature, mask_feature):
 
@@ -148,7 +145,7 @@ class InterpolateFeatures(EOTask):
         return eopatch
 
 
-    def execute(self, eopatch):
+    def execute(self, eopatch, mask_feature = None):
 
         '''Gap filling after data extraction, very useful if did not include it in the data extraction workflow'''
 
@@ -173,23 +170,21 @@ class InterpolateFeatures(EOTask):
         return eopatch
 
 
-def get_time_series_profile(patch, variable, mask_name, function = np.mean):
-    crop_mask = patch['mask_timeless'][mask_name].squeeze()
-    var = patch['data'][variable]
-    shape = var.shape[-1]
-    times = len(patch.timestamp)
+
+def get_time_series_profile(feature_array,
+                            crop_mask,
+                            function=np.nanmedian):
+
     # Transform mask from 3D to 4D
-    mask = crop_mask.reshape(1, crop_mask.shape[0], crop_mask.shape[1], 1)
+    times, h, w, shape = feature_array.shape
+    mask = crop_mask.reshape(1, h, w, 1)
     mask = [mask for k in range(times)]
     mask = np.concatenate(mask, axis=0)
     #######################
     mask = [mask for k in range(shape)]
     mask = np.concatenate(mask, axis=-1)
     ########################
-    a = np.ma.array(var, mask=(1-(mask==1)).astype(bool))
+    a = np.ma.array(feature_array, mask=np.invert(mask)) #np.invert(mask)
     ts_mean = np.ma.apply_over_axes(function, a, [1, 2])
     ts_mean = ts_mean.reshape(ts_mean.shape[0], ts_mean.shape[-1])
-    ts_mean = ts_mean.data
-    return {variable: ts_mean[:, n].flatten() for n in range(shape)}
-
-
+    return ts_mean

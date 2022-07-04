@@ -10,6 +10,11 @@ import numpy as np
 
 
 
+def save_numpy(path, array, name_array):
+    with open(os.path.join(path, name_array + '.npy'), 'wb') as f:
+        np.save(f, array)
+
+
 def MetaInfos(saving_path, N) :
     with rasterio.open(saving_path) as src0 :
         meta = src0.meta
@@ -76,6 +81,26 @@ def create_polygon_bbox(longitude, latitude, distance) :
                latitude+ic_y)
 
 
+
+def get_resampled_periods(start, end, year, days_range=1):
+    '''
+    Get the resampled periods from the resample range
+    '''
+    import dateutil
+    import datetime as dt
+    resample_range_ = (str(year) + start,
+                       str(year) + end,
+                       days_range)
+
+    start_date = dateutil.parser.parse(resample_range_[0])
+    end_date = dateutil.parser.parse(resample_range_[1])
+    step = dt.timedelta(days=resample_range_[2])
+
+    days = [start_date]
+    while days[-1] + step < end_date:
+        days.append(days[-1] + step)
+    days = [str(day).split(' ')[0] for day in days]
+    return days
 
 
 

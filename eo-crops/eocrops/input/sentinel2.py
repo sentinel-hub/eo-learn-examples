@@ -129,6 +129,7 @@ def workflow_instructions_S2L2A(config,
                          (FeatureType.DATA_TIMELESS, 'DEM'),
                          (FeatureType.MASK_TIMELESS, 'MASK')]
         linear_interp = preprocessing.InterpolateFeatures(resampled_range=resampled_range,
+                                                          features=['Cab', 'fapar', 'LAI', 'NDVI', 'NDWI', 'BANDS-S2-L2A'],
                                                           copy_features=copy_features)
 
     workflow = eolearn.core.LinearWorkflow(input_task,

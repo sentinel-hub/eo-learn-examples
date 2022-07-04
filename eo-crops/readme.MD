@@ -1,9 +1,9 @@
-# Earth observations for crop monitoring. 
+Earth observations for crop monitoring. 
 
 
 Small python module that brings together awesome functionality from Sentinelhub, eo-learn python package and OrfeoToolBox for basic downloading and data processing.
 
-## Installation
+# Installation
 
 To install the package, you must first clone the git repository to the desired folder
 
@@ -29,8 +29,8 @@ python -m ipykernel install --user --name=eo-crops
 jupyter notebook
 ```
 
-## Dependencies
+# Dependencies
 
-You should have OrfeoToolBox installed (https://www.orfeo-toolbox.org/CookBook/Installation.html) if you would like to do apply pansharpening and multitemporal speckle filtering. 
+You should have OrfeoToolBox installed (https://www.orfeo-toolbox.org/CookBook/Installation.html) if you would like to apply pansharpening and multitemporal speckle filtering (Quegan). 
 
 Also, you should have a Sentinelhub account with credentials. The latter can be sponsored using Network of Resources program https://www.sentinel-hub.com/Network-of-Resources/.
