@@ -1,7 +1,7 @@
 import math
 from eolearn.core import   FeatureType, EOTask
 import numpy as np
-
+from eolearn.core import AddFeatureTask, RemoveFeatureTask
 
 
 class VegetationIndicesVHRS(EOTask):
@@ -11,7 +11,6 @@ class VegetationIndicesVHRS(EOTask):
     def calcul_ratio_vegetation_indices(self):
         self.NDVI = (self.B4 - self.B3)/(self.B4 + self.B3)
         self.NDWI = (self.B2 - self.B4)/(self.B2 + self.B4)
-        #self.MSAVI2 = (2*self.B4 + 1 - ((2*self.B4 +1)^2)**0.5 - 8*(self.B4 - self.B3))/2
         self.VARI = (self.B2 - self.B3)/(self.B2 + self.B3 - self.B1)
 
     def execute(self, eopatch, **kwargs):
@@ -22,11 +21,17 @@ class VegetationIndicesVHRS(EOTask):
         self.B2 = arr0[..., 1]
         self.B3 = arr0[..., 2]
         self.B4 = arr0[..., 3]
-        #VIS
+        # VIS
         self.calcul_ratio_vegetation_indices()
-        eopatch.add_feature(FeatureType.DATA, "NDVI", self.NDVI[..., np.newaxis])
-        eopatch.add_feature(FeatureType.DATA, "NDWI", self.NDWI[..., np.newaxis])
-        eopatch.add_feature(FeatureType.DATA, "VARI", self.VARI[..., np.newaxis])
+        
+        add_NDVI = AddFeatureTask((FeatureType.DATA, 'NDVI'))
+        add_NDVI.execute(eopatch=eopatch, data=self.NDVI[..., np.newaxis])
+
+        add_NDWI = AddFeatureTask((FeatureType.DATA, 'NDWI'))
+        add_NDWI.execute(eopatch=eopatch, data=self.NDWI[..., np.newaxis])
+
+        add_VARI = AddFeatureTask((FeatureType.DATA, 'VARI'))
+        add_VARI.execute(eopatch=eopatch, data=self.VARI[..., np.newaxis])
 
         return eopatch
 
@@ -305,13 +310,26 @@ class VegetationIndicesS2(EOTask) :
         self.sunAzimuthAngles = illumination_array[..., 3]
 
         self.get_vegetation_indices()
-        eopatch.add_feature(FeatureType.DATA, "fapar", self.fapar[..., np.newaxis])
-        eopatch.add_feature(FeatureType.DATA, "LAI", self.LAI[..., np.newaxis])
-        eopatch.add_feature(FeatureType.DATA, "Cab", self.Cab[..., np.newaxis])
-        eopatch.add_feature(FeatureType.DATA, "NDVI", self.NDVI[..., np.newaxis])
-        eopatch.add_feature(FeatureType.DATA, "NDWI", self.NDWI[..., np.newaxis])
-        eopatch.add_feature(FeatureType.DATA, "GNDVI", self.GNDVI[..., np.newaxis])
-        eopatch.remove_feature(FeatureType.DATA, "ILLUMINATION")
+        add_fapar = AddFeatureTask((FeatureType.DATA, 'fapar'))
+        add_fapar.execute(eopatch=eopatch, data=self.fapar[..., np.newaxis])
+        
+        add_Cab = AddFeatureTask((FeatureType.DATA, 'Cab'))
+        add_Cab.execute(eopatch=eopatch, data=self.Cab[..., np.newaxis])
+
+        add_LAI = AddFeatureTask((FeatureType.DATA, 'LAI'))
+        add_LAI.execute(eopatch=eopatch, data=self.LAI[..., np.newaxis])
+
+        add_NDVI = AddFeatureTask((FeatureType.DATA, 'NDVI'))
+        add_NDVI.execute(eopatch=eopatch, data=self.NDVI[..., np.newaxis])
+
+        add_NDWI = AddFeatureTask((FeatureType.DATA, 'NDWI'))
+        add_NDWI.execute(eopatch=eopatch, data=self.NDWI[..., np.newaxis])
+
+        add_GNDVI = AddFeatureTask((FeatureType.DATA, 'GNDVI'))
+        add_GNDVI.execute(eopatch=eopatch, data=self.GNDVI[..., np.newaxis])
+
+        remove_illumination = RemoveFeatureTask([FeatureType.DATA, "ILLUMINATION"])
+        remove_illumination.execute(eopatch)
 
         return eopatch
 
@@ -332,9 +350,8 @@ class EuclideanNorm(EOTask) :
     def execute(self, eopatch) :
         arr = eopatch.data[self.in_feature_name]
         norm = np.sqrt(np.sum(arr**2, axis=-1))
-
-        eopatch.add_feature(FeatureType.DATA, self.feature_name, norm[..., np.newaxis])
-        return eopatch
+        add_ecnorm = AddFeatureTask((FeatureType.DATA, self.feature_name))
+        return add_ecnorm.execute(eopatch=eopatch, data = norm[..., np.newaxis])
 
 
 

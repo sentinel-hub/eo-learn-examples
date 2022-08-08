@@ -5,7 +5,6 @@ import eolearn.features
 import eolearn
 
 from sentinelhub import DataCollection
-from eolearn.core import SaveTask, FeatureType
 from eolearn.io import SentinelHubDemTask, SentinelHubEvalscriptTask
 import datetime
 
@@ -18,6 +17,8 @@ import multiprocessing
 
 import eocrops.tasks.vegetation_indices as vegetation_indices
 import eocrops.input.utils_sh as utils_sh
+
+from eolearn.core import SaveTask, linearly_connect_tasks, EOWorkflow, FeatureType, OutputTask
 
 
 def workflow_instructions_S2L2A(config,
@@ -75,46 +76,39 @@ def workflow_instructions_S2L2A(config,
         }
     """
 
-    input_task = SentinelHubEvalscriptTask(
-        features=[(FeatureType.DATA, 'BANDS', 'BANDS-S2-L2A'),
-                  (FeatureType.DATA, 'ILLUMINATION', 'ILLUMINATION'),
-                  (FeatureType.MASK, 'IS_DATA'),
-                  (FeatureType.MASK, 'CLM')],
-        data_collection=DataCollection.SENTINEL2_L2A,
-        evalscript=evalscript,
-        resolution=10,
-        maxcc=coverage_predicate,
-        time_difference=time_difference,
-        config=config,
-        max_threads=n_threads
-    )
+    input_task =\
+        SentinelHubEvalscriptTask(
+            features=[(FeatureType.DATA, 'BANDS', 'BANDS-S2-L2A'),
+                      (FeatureType.DATA, 'ILLUMINATION', 'ILLUMINATION'),
+                      (FeatureType.MASK, 'IS_DATA'),
+                      (FeatureType.MASK, 'CLM')],
+            data_collection=DataCollection.SENTINEL2_L2A,
+            evalscript=evalscript,
+            resolution=10,
+            maxcc=coverage_predicate,
+            time_difference=time_difference,
+            config=config,
+            max_threads=n_threads
+        )
+
 
     add_dem = SentinelHubDemTask('DEM', resolution=10, config=config)
-
     add_polygon_mask = preprocessing.PolygonMask(polygon)
-    field_bbox = utils.get_bounding_box(polygon)
-
-    cloud_mask = utils_sh.CloudMaskS2L2A()
+    cloud_mask = utils_sh.ValidDataS2()
 
     add_coverage = utils_sh.AddValidDataCoverage()
 
-    add_valid_mask = eolearn.mask.AddValidDataMaskTask(predicate=utils_sh.calculate_valid_data_mask)
+    add_valid_mask = utils_sh.AddValidDataMaskTask(predicate=utils_sh.calculate_valid_data_mask)
 
-    remove_cloudy_scenes = eolearn.features.SimpleFilterTask((eolearn.core.FeatureType.MASK, 'VALID_DATA'),
-                                                             # name of output mask
-                                                             utils_sh.ValidDataCoveragePredicate(coverage_predicate))
+
+    remove_cloudy_scenes = eolearn.features.SimpleFilterTask((eolearn.core.FeatureType.MASK, 'VALID_DATA'), utils_sh.ValidDataCoveragePredicate(coverage_predicate))
+
 
     vis = vegetation_indices.VegetationIndicesS2('BANDS-S2-L2A',
                                                  mask_data=bool(1 - interpolation['interpolate']))
 
-    norm = vegetation_indices.EuclideanNorm('ECNorm', 'BANDS-S2-L2A')
 
-    if path_out is None:
-        save = utils_sh.EmptyTask()
-    else:
-        if not os.path.isdir(path_out):
-            os.makedirs(path_out)
-        save = SaveTask(path_out, overwrite_permission=OverwritePermission.OVERWRITE_PATCH)
+    norm = vegetation_indices.EuclideanNorm('ECNorm', 'BANDS-S2-L2A')
 
     if not interpolation['interpolate']:
         linear_interp = utils_sh.EmptyTask()
@@ -128,20 +122,36 @@ def workflow_instructions_S2L2A(config,
         copy_features = [(FeatureType.MASK, 'CLM'),
                          (FeatureType.DATA_TIMELESS, 'DEM'),
                          (FeatureType.MASK_TIMELESS, 'MASK')]
+
         linear_interp = preprocessing.InterpolateFeatures(resampled_range=resampled_range,
-                                                          features=['Cab', 'fapar', 'LAI', 'NDVI', 'NDWI', 'BANDS-S2-L2A'],
                                                           copy_features=copy_features)
 
-    workflow = eolearn.core.LinearWorkflow(input_task,
-                                           cloud_mask, add_valid_mask,
-                                           add_coverage, remove_cloudy_scenes,
-                                           add_dem,
-                                           add_polygon_mask,
-                                           vis, norm,
-                                           linear_interp,
-                                           save)
 
-    result = workflow.execute({
-        input_task: {'bbox': field_bbox, 'time_interval': time_stamp}
-    })
-    return result.eopatch()
+    if path_out is None:
+        save = utils_sh.EmptyTask()
+
+    else:
+        os.makedirs(path_out, exist_ok=True)
+        save = SaveTask(path_out,
+                        overwrite_permission=OverwritePermission.OVERWRITE_PATCH)
+
+    output_task = OutputTask("eopatch")
+    workflow_nodes = linearly_connect_tasks(input_task,
+                                            cloud_mask, add_valid_mask,
+                                            add_coverage, remove_cloudy_scenes,
+                                            add_dem, add_polygon_mask,
+                                            vis, norm, linear_interp,
+                                            save, output_task)
+    workflow = EOWorkflow(workflow_nodes)
+    
+    field_bbox = utils.get_bounding_box(polygon)
+    result = workflow.execute(
+        {
+            workflow_nodes[0]: {
+                "bbox": field_bbox, 
+                "time_interval": time_stamp
+            }
+        }
+    )
+
+    return result.outputs["eopatch"]

@@ -2,7 +2,7 @@ import eolearn
 from eolearn.core import EOTask, FeatureType
 from sentinelhub import SHConfig
 import numpy as np
-
+from eolearn.core import AddFeatureTask, RemoveFeatureTask
 
 def config_sentinelhub_cred(api, client_id, client_secret):
     """
@@ -45,61 +45,48 @@ class AddValidDataCoverage(EOTask) :
     '''
 
     def execute(self, eopatch) :
-        valid_data = eopatch.get_feature(eolearn.core.FeatureType.MASK, 'VALID_DATA')
+        valid_data = eopatch[eolearn.core.FeatureType.MASK]['VALID_DATA']
         time, height, width, channels = valid_data.shape
 
         coverage = np.apply_along_axis(calculate_coverage, 1, valid_data.reshape((time, height*width*channels)))
+        add_coverage = AddFeatureTask((eolearn.core.FeatureType.SCALAR, 'COVERAGE'))
+        return add_coverage.execute(eopatch=eopatch, data=coverage[:, np.newaxis])
 
-        eopatch.add_feature(eolearn.core.FeatureType.SCALAR, 'COVERAGE', coverage[:, np.newaxis])
 
+class AddValidDataMaskTask(EOTask):
+    def execute(self, eopatch):
+        eopatch.mask["VALID_DATA"] = eopatch.mask["IS_DATA"].astype(bool) & ~(eopatch.mask["CLM"].astype(bool))
         return eopatch
 
 
-class SentinelHubValidData :
+class ValidDataS2(EOTask) :
     """
-    Combine Sen2Cor's classification map with `IS_DATA` to define a `VALID_DATA_SH` mask
-    The sentinel_hub's cloud mask is asumed to be found in eopatch.mask['CLM']
+    The tasks recognize clouds from Sentinel Scene Layers (SCL) obtained from Sen2Corr
+    """
+    def execute(self, eopatch) :
+        add_cloud = AddFeatureTask((eolearn.core.FeatureType.MASK, 'VALID_DATA'))
+        return add_cloud.execute(eopatch=eopatch, data=(eopatch.mask['IS_DATA']).astype(bool))
+
+class ValidDataVHRS(EOTask) :
+    """
+    The tasks recognize clouds from Sentinel Scene Layers (SCL) obtained from Sen2Corr
     """
 
+    def execute(self, eopatch) :
+        cloud_mask_ = np.invert(eopatch[FeatureType.MASK]['CLM'].astype(bool))
+
+        add_bool = AddFeatureTask((eolearn.core.FeatureType.MASK, 'IS_DATA'))
+        add_bool.execute(eopatch=eopatch, data=np.invert(cloud_mask_))
+        add_cloud = AddFeatureTask((eolearn.core.FeatureType.MASK, 'CLM'))
+        add_cloud.execute(eopatch=eopatch, data=cloud_mask_)
+        add_valid = AddFeatureTask((eolearn.core.FeatureType.MASK, 'VALID_DATA'))
+        add_valid.execute(eopatch=eopatch, data=np.invert(cloud_mask_))
+        return eopatch
+
+class ValidPixel :
     def __call__(self, eopatch) :
         return np.logical_and(eopatch.mask['IS_DATA'].astype(np.bool),
                               np.logical_not(eopatch.mask['CLM'].astype(np.bool)))
-
-class CloudMaskS2L2A(EOTask) :
-    """
-    The tasks recognize clouds from Sentinel Scene Layers (SCL) obtained from Sen2Corr
-    """
-    def execute(self, eopatch) :
-        eopatch.add_feature(FeatureType.MASK, "VALID_DATA", (eopatch.mask['IS_DATA']).astype(bool))
-        return eopatch
-
-
-
-class CloudMaskFromCLM(EOTask) :
-    """
-    The tasks recognize clouds from Sentinel Scene Layers (SCL) obtained from Sen2Corr
-    NDI = (A-B)/(A+B).
-    """
-
-    def execute(self, eopatch) :
-
-        CLM = eopatch.get_feature(FeatureType.MASK, 'CLM')
-        cloudy_f = list(CLM.flatten())
-
-        def return_na(x) :
-            if x in [1] :  # [3, 4] :
-                return True
-            else :
-                return False
-
-        g = np.array(list(map(lambda x : return_na(x), cloudy_f)))
-        g = g.reshape(CLM.shape[0], CLM.shape[1], CLM.shape[2])
-        eopatch.add_feature(FeatureType.MASK, "IS_DATA", (1-g[..., np.newaxis]).astype(bool))
-        eopatch.add_feature(FeatureType.MASK, "CLM", g[..., np.newaxis])
-        eopatch.add_feature(FeatureType.MASK, "VALID_DATA", (1-g[..., np.newaxis]).astype(bool))
-
-        return eopatch
-
 
 class CountValid(EOTask) :
     """
@@ -111,13 +98,14 @@ class CountValid(EOTask) :
         self.name = feature_name
 
     def execute(self, eopatch) :
-        eopatch.add_feature(FeatureType.MASK_TIMELESS, self.name, np.count_nonzero(eopatch.mask[self.what], axis=0))
-
+        add_count = AddFeatureTask((eolearn.core.FeatureType.MASK_TIMELESS, self.name))
+        add_count.execute(eopatch=eopatch, data=np.count_nonzero(eopatch.mask[self.what], axis=0))
         return eopatch
 
 
 class ValidDataCoveragePredicate :
-    ''' Keep an image only if below % of non contaminated pixels
+    '''
+    Keep an image only if below % of non contaminated pixels
     Inputs :
         - threshold (float) : upper bound of percentage of pixel predicted as cloudy
     '''
@@ -130,7 +118,8 @@ class ValidDataCoveragePredicate :
 
 
 class EmptyTask(EOTask) :
-    '''This task does not make any change. It is just to avoid to duplicate the LinearWorflow with if/else
+    '''
+    This task does not make any change. It is just to avoid to duplicate the LinearWorflow with if/else
     For example, saving a EOPatch in the workflow would depend if the user specify a path in the parameters of the function workflow
     '''
 

@@ -1,4 +1,3 @@
-import numpy as np
 from eolearn.geometry import VectorToRasterTask
 from eolearn.core import FeatureType, EOTask
 import sentinelhub
@@ -8,6 +7,9 @@ import copy
 import eocrops.utils.utils as utils
 from eolearn.geometry.morphology import ErosionTask
 
+from scipy.optimize import curve_fit
+import numpy as np
+from eolearn.core import RemoveFeatureTask
 
 class PolygonMask(EOTask) :
     """
@@ -117,20 +119,24 @@ class MaskPixels(EOTask):
 
 
 class InterpolateFeatures(EOTask):
-    def __init__(self, resampled_range, features,
-                 algorithm = 'linear', copy_features = None):
+    def __init__(self, resampled_range,
+                 features = None,
+                 algorithm = 'linear',
+                 copy_features = None):
         self.resampled_range = resampled_range
         self.features = features
         self.algorithm = algorithm
         self.copy_features = copy_features
 
-    def _interpolate_feature(self, eopatch, feature, mask_feature):
+    def _interpolate_feature(self, eopatch, features, mask_feature):
 
         kwargs = dict(mask_feature=mask_feature,
-                      copy_features=self.copy_features,
                       resample_range=self.resampled_range,
-                      feature =  [(FeatureType.DATA, feature)],
+                      feature = features,
                       bounds_error=False)
+
+        if self.resampled_range is not None:
+            kwargs['copy_features'] = self.copy_features
 
         if self.algorithm=='linear' :
             interp = LinearInterpolationTask(
@@ -145,46 +151,151 @@ class InterpolateFeatures(EOTask):
         return eopatch
 
 
-    def execute(self, eopatch, mask_feature = None):
+    def execute(self, eopatch):
 
         '''Gap filling after data extraction, very useful if did not include it in the data extraction workflow'''
 
-        dico = {}
+
         mask_feature = None
         if 'VALID_DATA' in list(eopatch.mask.keys()):
             mask_feature = (FeatureType.MASK, 'VALID_DATA')
 
-        for feature in self.features :
+        if self.features is None:
+            self.features = [(FeatureType.DATA, fname) for fname in eopatch.get_features()[FeatureType.DATA]]
+
+        dico = {}
+        for ftype, fname in self.features :
             new_eopatch = copy.deepcopy(eopatch)
-            new_eopatch = self._interpolate_feature(new_eopatch, feature, mask_feature)
-            dico[feature] = new_eopatch.data[feature]
+            new_eopatch = self._interpolate_feature(new_eopatch, (ftype, fname), mask_feature)
+            dico[fname] = new_eopatch[ftype][fname]
 
         eopatch['data'] = dico
-        t, h, w, _ = eopatch.data[feature].shape
+        t, h, w, _ = dico[fname].shape
         eopatch.timestamp = new_eopatch.timestamp
-        eopatch['mask']['IS_DATA'] = np.zeros((t, h, w, 1))+1
+        eopatch['mask']['IS_DATA'] = (np.zeros((t, h, w, 1))+1).astype(int)
         eopatch['mask']['VALID_DATA'] = (np.zeros((t, h, w, 1))+1).astype(bool)
         if "CLM" in eopatch.mask.keys():
-            eopatch.remove_feature(FeatureType.MASK, "CLM")
+            remove_feature = RemoveFeatureTask([(FeatureType.MASK, "CLM")])
+            remove_feature.execute(eopatch)
 
         return eopatch
 
 
+class CurveFitting(EOTask):
+    def __init__(self, range_doy = None):
+        self.range_doy = range_doy
+        self.params = None
 
-def get_time_series_profile(feature_array,
-                            crop_mask,
-                            function=np.nanmedian):
+    def get_time_series_profile(self,
+                                eopatch,
+                                feature,
+                                feature_mask = 'polygon_mask',
+                                function=np.nanmedian):
 
-    # Transform mask from 3D to 4D
-    times, h, w, shape = feature_array.shape
-    mask = crop_mask.reshape(1, h, w, 1)
-    mask = [mask for k in range(times)]
-    mask = np.concatenate(mask, axis=0)
-    #######################
-    mask = [mask for k in range(shape)]
-    mask = np.concatenate(mask, axis=-1)
-    ########################
-    a = np.ma.array(feature_array, mask=np.invert(mask)) #np.invert(mask)
-    ts_mean = np.ma.apply_over_axes(function, a, [1, 2])
-    ts_mean = ts_mean.reshape(ts_mean.shape[0], ts_mean.shape[-1])
-    return ts_mean
+        feature_array = eopatch[FeatureType.DATA][feature]
+        if feature_mask not in eopatch[FeatureType.MASK_TIMELESS].keys():
+            raise ValueError('The feature ' + feature_mask + " is missing in MASK_TIMELESS")
+        crop_mask = eopatch[FeatureType.MASK_TIMELESS][feature_mask]
+        # Transform mask from 3D to 4D
+        times, h, w, shape = feature_array.shape
+        mask = crop_mask.reshape(1, h, w, 1)
+        mask = [mask for k in range(times)]
+        mask = np.concatenate(mask, axis=0)
+        #######################
+        mask = [mask for k in range(shape)]
+        mask = np.concatenate(mask, axis=-1)
+        ########################
+        a = np.ma.array(feature_array, mask=np.invert(mask))
+        ts_mean = np.ma.apply_over_axes(function, a, [1, 2])
+        ts_mean = ts_mean.reshape(ts_mean.shape[0], ts_mean.shape[-1])
+        if self.range_doy is not None:
+            _, ids_filter = self.get_doy_period(eopatch)
+            ts_mean = ts_mean[ids_filter]
+        return ts_mean
+
+    def get_doy_period(self, eopatch):
+
+        first_of_year = eopatch.timestamp[0].timetuple().tm_yday
+        last_of_year = eopatch.timestamp[-1].timetuple().tm_yday
+
+        times = np.asarray([time.toordinal() for time in eopatch.timestamp])
+        times_ = (times - times[0]) / (times[-1] - times[0])
+        times_doy = times_ * (last_of_year - first_of_year) + first_of_year
+
+        if self.range_doy is not None:
+            ids_filter = np.where((times_doy > self.range_doy[0]) &
+                                  (times_doy < self.range_doy[1]))[0]
+            return times_doy[ids_filter], ids_filter
+        else:
+            return times_doy
+
+
+    @staticmethod
+    def _doubly_logistic(middle, initial_value, scale, a1, a2, a3, a4, a5):
+        '''
+        α1 is seasonal minimum greenness
+        α2 is the seasonal amplitude
+        α3 controls the green-up rate
+        α4 is the green-up inflection point
+        α5 controls the mid-growing season greenness trajectory.
+        :return:
+        '''
+        return initial_value + scale * np.piecewise(
+            middle,
+            [middle < a1, middle >= a1],
+            [lambda y: np.exp(-(((a1 - y) / a4) ** a5)), lambda y: np.exp(-(((y - a1) / a2) ** a3))],
+        )
+
+    def _fit_optimize_doubly(self, x_axis, y_axis, initial_parameters=None):
+        bounds_lower = [
+            np.min(y_axis),
+            -np.inf,
+            x_axis[0],
+            0.15,
+            1,
+            0.15,
+            1,
+        ]
+        bounds_upper = [
+            np.max(y_axis),
+            np.inf,
+            x_axis[-1],
+            np.inf,
+            np.inf,
+            np.inf,
+            np.inf,
+        ]
+        if initial_parameters is None:
+            initial_parameters = [np.mean(y_axis), 0.2, (x_axis[-1] - x_axis[0]) / 2, 0.15, 10, 0.15, 10]
+
+        popt, pcov = curve_fit(
+            self._doubly_logistic,
+            x_axis,
+            y_axis,
+            initial_parameters,
+            bounds=(bounds_lower, bounds_upper),
+            maxfev=1000000,
+            absolute_sigma=True,
+        )
+        self.params = popt
+
+        return popt
+
+    def execute(self, eopatch, feature, feature_mask = 'polygon_mask', function=np.nanmedian):
+
+        avg_ts = self.get_time_series_profile(eopatch, feature, feature_mask, function)
+        if self.range_doy is not None:
+            times_doy, _ = self.get_doy_period(eopatch)
+        else:
+            times_doy = self.get_doy_period(eopatch)
+
+        y = avg_ts.flatten()
+        x = (times_doy - times_doy[0]) / (times_doy[-1] - times_doy[0])
+
+        initial_value, scale, a1, a2, a3, a4, a5 = self._fit_optimize_doubly(x, y.flatten())
+        fitted = self._doubly_logistic(x, initial_value, scale, a1, a2, a3, a4, a5)
+
+        return fitted
+
+
+

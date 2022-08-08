@@ -1,6 +1,5 @@
 import eolearn
 from sentinelhub import  DataCollection
-from eolearn.core import SaveTask, FeatureType
 from eolearn.io import SentinelHubInputTask, SentinelHubDemTask
 import datetime
 from eolearn.core import OverwritePermission
@@ -11,6 +10,9 @@ import os
 import multiprocessing
 
 import eocrops.input.utils_sh as utils_sh
+
+from eolearn.core import linearly_connect_tasks, SaveTask, EOWorkflow, FeatureType, OutputTask
+
 
 
 
@@ -77,24 +79,32 @@ def workflow_instructions_S1IW(config, time_stamp,
 
 
     add_polygon_mask = preprocessing.PolygonMask(polygon)
-    field_bbox = utils.get_bounding_box(polygon)
 
     add_dem = SentinelHubDemTask('DEM', resolution=10, config=config)
 
     if path_out is None:
         save = utils_sh.EmptyTask()
     else:
-        if not os.path.isdir(path_out) :
-            os.makedirs(path_out)
+        os.makedirs(path_out, exist_ok=True)
         save = SaveTask(path_out, overwrite_permission=OverwritePermission.OVERWRITE_PATCH)
 
-    workflow = eolearn.core.LinearWorkflow(input_task,
-                                           add_dem,
-                                           add_polygon_mask,
-                                           save)
+    output_task = OutputTask("eopatch")
 
-    result = workflow.execute({
-        input_task : {'bbox' : field_bbox, 'time_interval' : time_stamp}
-    })
-    return result.eopatch()
+    workflow_nodes = linearly_connect_tasks(input_task,
+                                            add_dem,
+                                            add_polygon_mask,
+                                            save, output_task)
+    workflow = EOWorkflow(workflow_nodes)
+
+    field_bbox = utils.get_bounding_box(polygon)
+    result = workflow.execute(
+        {
+            workflow_nodes[0]: {
+                "bbox": field_bbox,
+                "time_interval": time_stamp
+            }
+        }
+    )
+
+    return result.outputs["eopatch"]
 

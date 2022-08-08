@@ -10,7 +10,7 @@ import numpy as np
 import datetime
 
 
-class CEHUBExtraction:
+class WeatherDownload:
     def __init__(self, api_key, queryBackbone, ids, coordinates, years, loop =  asyncio.new_event_loop()):
         '''
 
@@ -106,22 +106,24 @@ class CEHUBExtraction:
 
 #############################################################################################
 
-class CEHubFormatting:
+class WeatherPostprocess:
     def __init__(self,
                  input_file,
                  id_column,
-                 year_column, resample_range=('-01-01', '-12-31', 1),
+                 year_column,
+                 resample_range=('-01-01', '-12-31', 1),
                  planting_date_column = None, havest_date_column = None):
         '''
+        Format output file from meteoblue API into a pd.DataFrame
+
         :param input_file (pd.DataFrame) : input file with fields in-situ data
         :param id_column (str): Name of the column that contains ids of the fields to merge with CEHub data
         :param planting_date_column (str): Name of the column with planting date in doy format
         :param havest_date_column (str): Name of the column with harvest date in doy format
         :param year_column (str) : Name of the column with the yearly season associated to each field
-        :param resample_range (tuple): Interval of date to resample time series given a fixed period length (e.g. 8 days)
+        :param resample_range (tuple): Query period (interval of date) and number of days to aggregate over period (e.g. 8 days) instead of having daily data
         '''
 
-        self.resample_range = resample_range
         self.id_column = id_column
         self.planting_date_column = planting_date_column
         self.havest_date_column = havest_date_column
@@ -222,7 +224,7 @@ class CEHubFormatting:
         df = pd.merge(df_resampled, df_cehub,
                       on=['timestamp', self.year_column],
                       how='right')
-
+        #Interpolate over new periods
         fill_nas = df[['period', 'location']].groupby('location').apply(
             lambda group: group.interpolate(method='pad', limit=self.resample_range[-1]))
 

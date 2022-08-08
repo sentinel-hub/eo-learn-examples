@@ -1,8 +1,6 @@
 import numpy as np
 
-import eolearn
-
-from eolearn.core import FeatureType, EOTask
+from eolearn.core import FeatureType, EOTask, AddFeatureTask
 from pathlib import Path
 from osgeo import gdal
 import os
@@ -11,7 +9,7 @@ import shutil
 import subprocess
 import rasterio
 
-from eolearn.io.local_io import ExportToTiffTask, ImportFromTiffTask
+from eolearn.io import ExportToTiffTask, ImportFromTiffTask
 
 
 
@@ -71,13 +69,13 @@ class MultitempSpeckleFiltering(EOTask):
 
     def _save_temporary_geotiff(self, i, date, eopatch):
         ## TODO : Find a way to write temporary file without writing on disk using ExportToTiffTask to make the process faster
-        export = ExportToTiffTask(feature=self.feature_name,
+        export = ExportToTiffTask(feature= (FeatureType.DATA, self.feature_name),
                                   folder=os.path.join(self.path_in, 'S1_VV/S1_VV_' + date),
                                   band_indices=[0],
                                   date_indices=[i])
         export.execute(eopatch)
 
-        export = ExportToTiffTask(feature=self.feature_name,
+        export = ExportToTiffTask(feature= (FeatureType.DATA, self.feature_name),
                                   folder=os.path.join(self.path_in, 'S1_VH/S1_VH_' + date),
                                   band_indices=[1],
                                   date_indices=[i])
@@ -96,7 +94,7 @@ class MultitempSpeckleFiltering(EOTask):
         times = list(eopatch.timestamp)
         for i, t in enumerate(times):
             date = self._refactor_dates(t)
-            self._save_temporary_geotiff(i,date,eopatch)
+            self._save_temporary_geotiff(i, date, eopatch)
 
         ########################################################################################################
         for pol in ['VV', 'VH']:
@@ -112,18 +110,17 @@ class MultitempSpeckleFiltering(EOTask):
             meta['count'] = len(times)
             year = str(eopatch.timestamp[0].year)
             path_tif = outfiles[0].split('_' + year)[0] + '.tif'
-            if 'outcore_filtered.tif' in os.listdir(outdir):
+            if 'outcore_filtered.tif' in os.listdir(str(outdir)):
                 outfiles.remove(os.path.join(outdir, 'outcore_filtered.tif'))
             outfiles.sort()
 
-            with rasterio.open(os.path.join(os.getcwd(), path_tif), 'w', **meta) as dst:
+            with rasterio.open(os.path.join(self.path_in, path_tif), 'w', **meta) as dst:
                 for i in range(1, len(times) + 1):
-                    img = gdal.Open(os.path.join(os.getcwd(), outfiles[i - 1])).ReadAsArray()
+                    img = gdal.Open(os.path.join(self.path_in, outfiles[i - 1])).ReadAsArray()
                     dst.write_band(i, img)
 
             import_tif = ImportFromTiffTask((FeatureType.DATA, pol + '_filtered'), path_tif)
             eopatch = import_tif.execute(eopatch)
-
 
         shutil.rmtree(os.path.join(self.path_in, 'S1_VV_filtered'))
         shutil.rmtree(os.path.join(self.path_in, 'S1_VH_filtered'))
@@ -165,13 +162,13 @@ class PanSharpening(EOTask):
         if band_indices is None :
             band_indices = list(range(4))
 
-        export = ExportToTiffTask(feature=self.fname,
+        export = ExportToTiffTask(feature=(FeatureType.DATA, self.fname),
                                   folder=os.path.join(self.path_temporary_files, 'PAN_' + date),
                                   band_indices=[-1],
                                   date_indices=[i])
         export.execute(eopatch)
 
-        export = ExportToTiffTask(feature=self.fname,
+        export = ExportToTiffTask(feature=(FeatureType.DATA, self.fname),
                                   folder=os.path.join(self.path_temporary_files, 'BANDS_' + date),
                                   band_indices=band_indices,
                                   date_indices=[i])
@@ -209,6 +206,6 @@ class PanSharpening(EOTask):
         pan_bands = np.stack(pan_bands, axis =0)
         self._clean_temporary_files()
 
-        eopatch.add_feature(eolearn.core.FeatureType.DATA, 'BANDS-PAN', pan_bands)
+        add_pan = AddFeatureTask((FeatureType.DATA, 'BANDS-PAN'))
 
-        return eopatch
+        return add_pan.execute(eopatch=eopatch, data=pan_bands)

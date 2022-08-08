@@ -25,11 +25,10 @@ import eocrops.utils.utils as utils
 import eocrops.tasks.preprocessing as preprocessing
 import eocrops.tasks.cmd_otb as cmd_otb
 import eocrops.input.utils_sh as utils_sh
-from eolearn.core import SaveTask, FeatureType, OverwritePermission,SaveTask
+from eolearn.core import SaveTask, FeatureType, OverwritePermission, linearly_connect_tasks, EOWorkflow, OutputTask
 
 
-
-class DownloadVHRSSentinelHub :
+class DownloadVHRSSentinelHub:
     '''
     Initialize query parameters and ingest data into SH
     Parameters
@@ -356,7 +355,7 @@ class DownloadVHRSSentinelHub :
             evalscript=evalscript_byoc,
         )
 
-        cloud_mask = utils_sh.CloudMaskFromCLM()
+        cloud_mask = utils_sh.ValidDataVHRS()
         add_polygon_mask = preprocessing.PolygonMask(self.shapefile)
         pixels_masking = preprocessing.MaskPixels([bands_name])
 
@@ -375,19 +374,31 @@ class DownloadVHRSSentinelHub :
         if saving_path is None :
             save = utils_sh.EmptyTask()
         else :
-            if not os.path.isdir(saving_path) :
-                os.makedirs(saving_path)
+            os.makedirs(saving_path, exist_ok=True)
             save = SaveTask(saving_path, overwrite_permission=OverwritePermission.OVERWRITE_PATCH)
 
-        workflow = eolearn.core.LinearWorkflow(input_task,
-                                               cloud_mask,
-                                               add_polygon_mask,
-                                               pixels_masking,
-                                               pansharpen,
-                                               vis,
-                                               save)
+        output_task = OutputTask("eopatch")
 
-        return input_task, workflow, save
+        workflow_nodes = linearly_connect_tasks(input_task,
+                                                cloud_mask,
+                                                add_polygon_mask,
+                                                pixels_masking,
+                                                pansharpen,
+                                                vis, save, output_task)
+        workflow = EOWorkflow(workflow_nodes)
+
+        field_bbox = utils.get_bounding_box(self.shapefile)
+
+        result = workflow.execute(
+            {
+                workflow_nodes[0]: {
+                    "bbox": field_bbox,
+                    "time_interval": self.time_stamp
+                }
+            }
+        )
+
+        return result.outputs["eopatch"]
 
 
     def get_data(self, order_id, collection_id, provider, resolution, pansharpen = False, otb_path = None) :
@@ -403,25 +414,19 @@ class DownloadVHRSSentinelHub :
         -------
 
         '''
-        field_bbox = utils.get_bounding_box(self.shapefile)
         ##########################################
         # Define the byoc
         byoc = DataCollection.define_byoc(
             collection_id=collection_id,
             name=str(order_id),
         )
-        input_task, workflow, save = self._workflow_vhrs(byoc,
-                                                         provider,
-                                                         resolution,
-                                                         bands_name='BANDS',
-                                                         pansharpen=pansharpen,
-                                                         otb_path = otb_path)
-
-        result = workflow.execute({
-            input_task : {'bbox' : field_bbox, 'time_interval': self.time_stamp}
-        })
-
-        return result.eopatch()
+        eopatch = self._workflow_vhrs(byoc,
+                                      provider,
+                                      resolution,
+                                      bands_name='BANDS',
+                                      pansharpen=pansharpen,
+                                      otb_path = otb_path)
+        return eopatch
 
 
 
