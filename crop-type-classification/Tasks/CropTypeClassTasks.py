@@ -5,22 +5,23 @@ Created on Mon Oct  7 11:36:12 2019
 @author: willing
 """
 
+import enum
+import itertools
+import os
+
+import geopandas as gpd
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
 # Imports
-from eolearn.core import EOTask, FeatureType, EOPatch
+from eolearn.core import EOPatch, EOTask, FeatureType
 from eolearn.geometry import PointSamplingTask
+from sentinelhub import CRS, GeopediaFeatureIterator, GeopediaSession
+from shapely.geometry import Polygon
+from skimage.morphology import binary_dilation, binary_erosion, disk
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from sentinelhub import CRS, GeopediaFeatureIterator, GeopediaSession
-from skimage.morphology import disk, binary_dilation, binary_erosion
-from shapely.geometry import Polygon
-import pandas as pd
-import geopandas as gpd
-
-import os
-import enum
-import numpy as np
-import matplotlib.pyplot as plt
-import itertools
 
 ###########################################################################
 

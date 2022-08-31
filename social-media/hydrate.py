@@ -1,8 +1,8 @@
+import json
 import os
 import sys
 import time
 from math import ceil
-import json
 
 from twython import Twython
 

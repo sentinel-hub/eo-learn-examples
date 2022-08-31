@@ -6,16 +6,13 @@ List some configuration parameters for training model
 
 import os
 from os import path as op
-from sklearn.metrics import (
-    precision_recall_fscore_support,
-    # f1_score, fbeta_score,
-    classification_report,
-)
+
 import keras
 import keras.backend as K
-from hyperopt import hp
-from focal_losses import categorical_focal_loss
 import tensorflow as tf
+from focal_losses import categorical_focal_loss
+from hyperopt import hp
+from sklearn.metrics import classification_report, precision_recall_fscore_support  # f1_score, fbeta_score,
 
 # from focal_losses import categorical_focal_loss_fixed
 # Set directories for saving model weights and tensorboard information

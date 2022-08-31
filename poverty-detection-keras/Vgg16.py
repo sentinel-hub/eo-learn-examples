@@ -1,25 +1,26 @@
 import os
-from os import path as op
-from functools import partial
-from datetime import datetime as dt
 import pprint
-from keras.preprocessing.image import ImageDataGenerator
-
 import ssl
+from datetime import datetime as dt
+from functools import partial
+from os import path as op
 
 import numpy as np
-from keras import backend as K
-from keras.models import Model
-from keras.layers import Dense, Dropout
-from keras.optimizers import Adam, rmsprop, SGD
-from keras.applications.vgg16 import VGG16, preprocess_input as vgg_preproc
-
-from keras.callbacks import ModelCheckpoint, EarlyStopping, TensorBoard, ReduceLROnPlateau
-from hyperopt import fmin, Trials, STATUS_OK, tpe
 import yaml
-
-from train_config_pd import tboard_dir, ckpt_dir, data_dir, model_params as MP, train_params as TP, data_flow as DF
-
+from hyperopt import STATUS_OK, Trials, fmin, tpe
+from keras import backend as K
+from keras.applications.vgg16 import VGG16
+from keras.applications.vgg16 import preprocess_input as vgg_preproc
+from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau, TensorBoard
+from keras.layers import Dense, Dropout
+from keras.models import Model
+from keras.optimizers import SGD, Adam, rmsprop
+from keras.preprocessing.image import ImageDataGenerator
+from train_config_pd import ckpt_dir, data_dir
+from train_config_pd import data_flow as DF
+from train_config_pd import model_params as MP
+from train_config_pd import tboard_dir
+from train_config_pd import train_params as TP
 
 ######################
 # Params for hyperopt

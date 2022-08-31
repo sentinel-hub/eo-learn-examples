@@ -6,8 +6,8 @@ Script adopted from eo-learn land-cover-map example
 get_s2_sentinelhub.py
 """
 
-from eolearn.core import EOTask, FeatureType, SaveToDisk, OverwritePermission, LinearWorkflow, EOPatch, LoadFromDisk
 import numpy as np
+from eolearn.core import EOPatch, EOTask, FeatureType, LinearWorkflow, LoadFromDisk, OverwritePermission, SaveToDisk
 
 
 class SentinelHubValidData:

@@ -1,8 +1,8 @@
-import matplotlib.pyplot as plt
 import datetime as dt
-import numpy as np
 
-from sentinelhub import SHConfig, CRS, BBox, DataCollection, SentinelHubRequest, MimeType, bbox_to_dimensions
+import matplotlib.pyplot as plt
+import numpy as np
+from sentinelhub import CRS, BBox, DataCollection, MimeType, SentinelHubRequest, SHConfig, bbox_to_dimensions
 
 PRECISION_SCORES = 4
 PRECISION_THRESHOLD = None

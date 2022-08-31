@@ -5,16 +5,16 @@ utils.py
 
 Utility functions for printing training details
 """
-import shutil
 import pprint
+import shutil
 
-import numpy as np
 import matplotlib as mpl
+import numpy as np
+import train_config_pd as tcf
 from keras.models import model_from_yaml
 
 # from pygeotile.tile import Tile
 
-import train_config_pd as tcf
 
 
 def print_start_details(start_time):
