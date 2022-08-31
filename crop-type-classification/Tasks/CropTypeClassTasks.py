@@ -27,38 +27,39 @@ import itertools
 
 # Define Plot characteristics of classes
 class LPISCLASS(enum.Enum):
-    NO_DATA = (0, 'No Data', 'white')
-    Beets = (1, 'Beets', 'orange')
-    Meadows = (2, 'Meadows', 'black')
-    Fallow_land = (3, 'Fallow land', 'xkcd:azure')
-    Peas = (4, 'Peas', 'xkcd:salmon')
-    Pasture = (5, 'Pasture', 'xkcd:navy')
-    Hop = (6, 'Hop', 'xkcd:lavender')
-    Grass = (7, 'Grass', 'xkcd:lightblue')
-    Poppy = (8, 'Poppy', 'xkcd:brown')
-    Winter_rape = (9, 'Winter rape', 'xkcd:shit')
-    Maize = (10, 'Maize', 'xkcd:beige')
-    Winter_cereals = (11, 'Winter cereals', 'xkcd:apricot')
-    LL_ao_GM = (12, 'LL and/or GM', 'crimson')
-    Pumpkins = (13, 'Pumpkins', 'lightgrey')
-    Soft_fruit = (14, 'Soft fruit', 'firebrick')
-    Summer_cereals = (15, 'Summer cereals', 'xkcd:grey')
-    Sun_flower = (16, 'Sun flower', 'xkcd:jade')
-    Vegetables = (17, 'Vegetables', 'xkcd:ultramarine')
-    Buckwheat = (18, 'Buckwheat', 'xkcd:tan')
-    Alpine_Meadows = (19, 'Alpine meadows', 'xkcd:lime')
-    Potatoes = (20, 'Potatoes', 'pink')
-    Beans = (21, 'Beans', 'xkcd:darkgreen')
-    Vineyards = (22, 'Vineyards', 'magenta')
-    Other = (23, 'Other', 'xkcd:gold')
-    Soybean = (24, 'Soybean', 'xkcd:clay')
-    Orchards = (25, 'Orchards', 'olivedrab')
-    Multi_use = (26, 'Multi use', 'orangered')
+    NO_DATA = (0, "No Data", "white")
+    Beets = (1, "Beets", "orange")
+    Meadows = (2, "Meadows", "black")
+    Fallow_land = (3, "Fallow land", "xkcd:azure")
+    Peas = (4, "Peas", "xkcd:salmon")
+    Pasture = (5, "Pasture", "xkcd:navy")
+    Hop = (6, "Hop", "xkcd:lavender")
+    Grass = (7, "Grass", "xkcd:lightblue")
+    Poppy = (8, "Poppy", "xkcd:brown")
+    Winter_rape = (9, "Winter rape", "xkcd:shit")
+    Maize = (10, "Maize", "xkcd:beige")
+    Winter_cereals = (11, "Winter cereals", "xkcd:apricot")
+    LL_ao_GM = (12, "LL and/or GM", "crimson")
+    Pumpkins = (13, "Pumpkins", "lightgrey")
+    Soft_fruit = (14, "Soft fruit", "firebrick")
+    Summer_cereals = (15, "Summer cereals", "xkcd:grey")
+    Sun_flower = (16, "Sun flower", "xkcd:jade")
+    Vegetables = (17, "Vegetables", "xkcd:ultramarine")
+    Buckwheat = (18, "Buckwheat", "xkcd:tan")
+    Alpine_Meadows = (19, "Alpine meadows", "xkcd:lime")
+    Potatoes = (20, "Potatoes", "pink")
+    Beans = (21, "Beans", "xkcd:darkgreen")
+    Vineyards = (22, "Vineyards", "magenta")
+    Other = (23, "Other", "xkcd:gold")
+    Soybean = (24, "Soybean", "xkcd:clay")
+    Orchards = (25, "Orchards", "olivedrab")
+    Multi_use = (26, "Multi use", "orangered")
 
     def __init__(self, val1, val2, val3):
         self.id = val1
         self.class_name = val2
         self.color = val3
+
 
 class AddLPISLayerFromLocal(EOTask):
     """
@@ -75,10 +76,11 @@ class AddLPISLayerFromLocal(EOTask):
         eopatch[self.feature_type][self.feature_name] = gdf
         return eopatch
 
+
 # Task for 2.2 Prepare LPIS data
 class GroupLPIS(EOTask):
     """
-        Task to group the LPIS data into wanted groups
+    Task to group the LPIS data into wanted groups
     """
 
     def __init__(self, year, lpis_to_group_file, crop_group_file):
@@ -115,7 +117,7 @@ class GroupLPIS(EOTask):
 # Tasks for EOPatch preparation
 class ConcatenateData(EOTask):
     """
-        Task to concatenate data arrays along the last dimension
+    Task to concatenate data arrays along the last dimension
     """
 
     def __init__(self, feature_name, feature_names_to_concatenate):
@@ -129,10 +131,11 @@ class ConcatenateData(EOTask):
 
         return eopatch
 
+
 class CleanLPIS(EOTask):
     """
-        Task to delete columns ['SNAR_BEZEI_NAME', "CROP_ID", "english", "slovenian", "latin", "GROUP_1", "GROUP_1_ID"]
-        from vector dataset to enable LPIS regrouping
+    Task to delete columns ['SNAR_BEZEI_NAME', "CROP_ID", "english", "slovenian", "latin", "GROUP_1", "GROUP_1_ID"]
+    from vector dataset to enable LPIS regrouping
     """
 
     def __init__(self, year):
@@ -141,25 +144,30 @@ class CleanLPIS(EOTask):
     def execute(self, eopatch):
         lpis = eopatch.vector_timeless[f"LPIS_{self.year}"]
 
-        lpis.drop(columns=["SNAR_BEZEI_NAME", "CROP_ID", "english", "slovenian", "latin", "GROUP_1", "GROUP_1_ID"], axis=1, inplace=True)
+        lpis.drop(
+            columns=["SNAR_BEZEI_NAME", "CROP_ID", "english", "slovenian", "latin", "GROUP_1", "GROUP_1_ID"],
+            axis=1,
+            inplace=True,
+        )
 
         eopatch.vector_timeless[f"LPIS_{self.year}"] = lpis
 
         return eopatch
 
+
 class SamplingTaskTask(EOTask):
     """
-        Adapted PointSamplingTask for customizing 'n_samples' and 'ref_labels' for each specific EOPatch
+    Adapted PointSamplingTask for customizing 'n_samples' and 'ref_labels' for each specific EOPatch
     """
+
     def __init__(self, grouping_id, pixel_thres, samp_class):
         self.grouping_id = grouping_id
         self.pixel_thres = pixel_thres
         self.samp_class = samp_class
 
     def execute(self, eopatch):
-
-        classes = eopatch.mask_timeless[f'LPIS_class_{self.grouping_id}_ERODED']
-        w,h,c = classes.shape
+        classes = eopatch.mask_timeless[f"LPIS_class_{self.grouping_id}_ERODED"]
+        w, h, c = classes.shape
         classes = classes.reshape(w * h, 1).squeeze()
         unique, counts = np.unique(classes, return_counts=True)
         classcount = dict(zip(unique, counts))
@@ -175,28 +183,33 @@ class SamplingTaskTask(EOTask):
         # TASK FOR SPATIAL SAMPLING
         # evenly sample about pixels from patches
         spatial_sampling = PointSamplingTask(
-            even_sampling = True,
+            even_sampling=True,
             n_samples=n_samples,
-            ref_mask_feature=f'LPIS_class_{self.grouping_id}_ERODED',
+            ref_mask_feature=f"LPIS_class_{self.grouping_id}_ERODED",
             ref_labels=ref_labels,
             sample_features=[  # tag fields to sample
-                (FeatureType.DATA, 'FEATURES', 'FEATURES_SAMPLED'), # feature dicts to sample and where to save samples
-                (FeatureType.MASK_TIMELESS,
-                 f'LPIS_class_{self.grouping_id}_ERODED', # label dict to sample
-                 f'LPIS_class_{self.grouping_id}_ERODED_SAMPLED') # label dict to save samples
-            ])
+                (FeatureType.DATA, "FEATURES", "FEATURES_SAMPLED"),  # feature dicts to sample and where to save samples
+                (
+                    FeatureType.MASK_TIMELESS,
+                    f"LPIS_class_{self.grouping_id}_ERODED",  # label dict to sample
+                    f"LPIS_class_{self.grouping_id}_ERODED_SAMPLED",
+                ),  # label dict to save samples
+            ],
+        )
 
         spatial_sampling.execute(eopatch)
 
         return eopatch
 
+
 # Utility function for creating a list of all eopatches found in an Output folder
 def get_patch_list(folder):
     """
-    Returns a list with EOPatch names found in the provided folder. 
+    Returns a list with EOPatch names found in the provided folder.
     """
     return os.listdir(folder)
-    
+
+
 # Function to split dataset into training and test data for multiple EOPatches
 def train_test_split_eopatches(patch_array, test_ratio, features_dict, labels_dict):
     """
@@ -216,7 +229,6 @@ def train_test_split_eopatches(patch_array, test_ratio, features_dict, labels_di
     features_count = f
     f_count = t * f
 
-
     # create training and test dataset
     features_train = np.zeros([0, f_count])
     for eopatch in patch_array[trainIDs]:
@@ -232,14 +244,22 @@ def train_test_split_eopatches(patch_array, test_ratio, features_dict, labels_di
         addfeatures_test = np.moveaxis(addfeatures_test, 1, 3).reshape(p * w * h, t * f)
         features_test = np.concatenate((features_test, addfeatures_test))
 
-    labels_train = np.zeros([0, ])
+    labels_train = np.zeros(
+        [
+            0,
+        ]
+    )
     for eopatch in patch_array[trainIDs]:
         addlabels_train = np.array([eopatch.mask_timeless[labels_dict]])
         p, w, h, f = addlabels_train.shape
         addlabels_train = np.moveaxis(addlabels_train, 1, 2).reshape(p * w * h, 1).squeeze()
         labels_train = np.concatenate((labels_train, addlabels_train))
 
-    labels_test = np.zeros([0, ])
+    labels_test = np.zeros(
+        [
+            0,
+        ]
+    )
     for eopatch in patch_array[testIDs]:
         addlabels_test = np.array([eopatch.mask_timeless[labels_dict]])
         p, w, h, f = addlabels_test.shape
@@ -247,6 +267,7 @@ def train_test_split_eopatches(patch_array, test_ratio, features_dict, labels_di
         labels_test = np.concatenate((labels_test, addlabels_test))
 
     return features_train, features_test, labels_train, labels_test, timeframes_count, features_count
+
 
 # Function to split dataset into training and test data for multiple EOPatches
 def train_test_split_eopatch(patch_array, features_dict, labels_dict):
@@ -273,6 +294,7 @@ def train_test_split_eopatch(patch_array, features_dict, labels_dict):
     X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=0.25, random_state=0)
 
     return X_train, X_test, y_train, y_test, timeframes_count, features_count
+
 
 # Function to mask out labels that are not in both train and test data and also mask out samples where features include NaN values
 def masking(X_train, X_test, y_train, y_test):
@@ -322,14 +344,20 @@ def masking(X_train, X_test, y_train, y_test):
         X_test = X_test[~mask_test]
         y_test = y_test[~mask_test]
 
-    return(X_train, X_test, y_train, y_test)
+    return (X_train, X_test, y_train, y_test)
 
 
 # Function for plotting the confusion matrix
-def plot_confusion_matrix(cm, classes,
-                          normalize=False,
-                          title='Confusion matrix',
-                          cmap=plt.cm.Blues, ylabel='True label', xlabel='Predicted label', filename=None):
+def plot_confusion_matrix(
+    cm,
+    classes,
+    normalize=False,
+    title="Confusion matrix",
+    cmap=plt.cm.Blues,
+    ylabel="True label",
+    xlabel="Predicted label",
+    filename=None,
+):
     """
     This function prints and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.
@@ -337,28 +365,33 @@ def plot_confusion_matrix(cm, classes,
     np.set_printoptions(precision=2, suppress=True)
 
     if normalize:
-        cm = cm.astype('float') / (cm.sum(axis=1)[:, np.newaxis] + np.finfo(np.float).eps)
+        cm = cm.astype("float") / (cm.sum(axis=1)[:, np.newaxis] + np.finfo(np.float).eps)
 
-    plt.imshow(cm, interpolation='nearest', cmap=cmap, vmin=0, vmax=1)
+    plt.imshow(cm, interpolation="nearest", cmap=cmap, vmin=0, vmax=1)
     plt.title(title, fontsize=20)
     # plt.colorbar()
     tick_marks = np.arange(len(classes))
     plt.xticks(tick_marks, classes, rotation=90, fontsize=20)
     plt.yticks(tick_marks, classes, fontsize=20)
 
-    fmt = '.2f' if normalize else 'd'
-    thresh = cm.max() / 2.
+    fmt = ".2f" if normalize else "d"
+    thresh = cm.max() / 2.0
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        plt.text(j, i, format(cm[i, j], fmt),
-                 horizontalalignment="center",
-                 color="lightgrey" if cm[i, j] > thresh else "black",
-                 fontsize=12)
+        plt.text(
+            j,
+            i,
+            format(cm[i, j], fmt),
+            horizontalalignment="center",
+            color="lightgrey" if cm[i, j] > thresh else "black",
+            fontsize=12,
+        )
 
     plt.tight_layout()
     plt.ylabel(ylabel, fontsize=20)
     plt.xlabel(xlabel, fontsize=20)
     plt.ylim(top=-0.5)
-    plt.ylim(bottom=len(classes)-0.5)
+    plt.ylim(bottom=len(classes) - 0.5)
+
 
 # Task for predicting a whole EOPatch
 class PredictPatch(EOTask):
@@ -386,8 +419,9 @@ class PredictPatch(EOTask):
             eopatch.add_feature(FeatureType.MASK_TIMELESS, self.predicted_labels_name, plabels)
 
         except:  # TempCNN model prediction
-            ftrs_tcnn = np.reshape(scaled_ftrs,
-                                   (-1, eopatch.data['FEATURES'].shape[0], eopatch.data['FEATURES'].shape[3]))
+            ftrs_tcnn = np.reshape(
+                scaled_ftrs, (-1, eopatch.data["FEATURES"].shape[0], eopatch.data["FEATURES"].shape[3])
+            )
             plabels = np.argmax(self.model.predict(ftrs_tcnn), axis=-1)
             plabels = plabels.reshape(w, h)
             plabels = plabels[..., np.newaxis]
@@ -425,24 +459,24 @@ class AddAreaRatio(EOTask):
 
         return eopatch
 
-    
+
 def get_crop_features(table_id):
     """
     Returns DataFrame of crops for table_id from Geopedia
 
-    :return: pandas DataFrame 
+    :return: pandas DataFrame
     :rtype: pandas.DataFrame
     """
     gpd_session = GeopediaSession()
     crop_iterator = GeopediaFeatureIterator(layer=table_id, gpd_session=gpd_session)
-    to_crop_id = [{'crop_geopedia_idx': code['id'], **code['properties']} for code in crop_iterator]
+    to_crop_id = [{"crop_geopedia_idx": code["id"], **code["properties"]} for code in crop_iterator]
 
     df = pd.DataFrame(to_crop_id)
-    df['crop_geopedia_idx'] = pd.to_numeric(df.crop_geopedia_idx)
-    
+    df["crop_geopedia_idx"] = pd.to_numeric(df.crop_geopedia_idx)
+
     return df
-    
-    
+
+
 # FixLPIS utilties
 def get_slovenia_crop_geopedia_idx_to_crop_id_mapping():
     """
@@ -506,6 +540,7 @@ class FixLPIS(EOTask):
     :param country: Name of the country
     :type country: str
     """
+
     def __init__(self, feature, country):
         self.feature = feature
         self.country = country
@@ -514,56 +549,61 @@ class FixLPIS(EOTask):
         self._set_mapping()
 
     def _set_mapping(self):
-        if self.country == 'Slovenia':
+        if self.country == "Slovenia":
             self.mapping = get_slovenia_crop_geopedia_idx_to_crop_id_mapping()
-        elif self.country == 'Austria':
+        elif self.country == "Austria":
             self.mapping = get_austria_crop_geopedia_idx_to_crop_id_mapping()
-        elif self.country == 'Denmark':
+        elif self.country == "Denmark":
             self.mapping = get_danish_crop_geopedia_idx_to_crop_id_mapping()
 
     def _fix_slovenian_lpis(self, eopatch):
         """
         See Task's docs for the explanation of what is done.
         """
-        eopatch.vector_timeless[self.feature].rename(index=str, columns={"SIFRA_KMRS": "crop_geopedia_idx"},
-                                                    inplace=True)
-        eopatch.vector_timeless[self.feature] = pd.merge(eopatch.vector_timeless[self.feature],
-                                                         self.mapping,
-                                                         on='crop_geopedia_idx')
-        eopatch.vector_timeless[self.feature].loc[eopatch.vector_timeless[self.feature]['SIFKMRS'] == '204_a',
-                                                  'SIFKMRS'] = '1204'
-        eopatch.vector_timeless[self.feature]['SIFKMRS'] = pd.to_numeric(eopatch.vector_timeless[self.feature]['SIFKMRS'])
-
+        eopatch.vector_timeless[self.feature].rename(
+            index=str, columns={"SIFRA_KMRS": "crop_geopedia_idx"}, inplace=True
+        )
+        eopatch.vector_timeless[self.feature] = pd.merge(
+            eopatch.vector_timeless[self.feature], self.mapping, on="crop_geopedia_idx"
+        )
+        eopatch.vector_timeless[self.feature].loc[
+            eopatch.vector_timeless[self.feature]["SIFKMRS"] == "204_a", "SIFKMRS"
+        ] = "1204"
+        eopatch.vector_timeless[self.feature]["SIFKMRS"] = pd.to_numeric(
+            eopatch.vector_timeless[self.feature]["SIFKMRS"]
+        )
 
     def _fix_austrian_lpis(self, eopatch):
         """
         See Task's docs for the explanation of what is done.
         """
-        eopatch.vector_timeless[self.feature] = pd.merge(eopatch.vector_timeless[self.feature],
-                                                         self.mapping,
-                                                         on='SNAR_BEZEI')
+        eopatch.vector_timeless[self.feature] = pd.merge(
+            eopatch.vector_timeless[self.feature], self.mapping, on="SNAR_BEZEI"
+        )
 
     def _fix_danish_lpis(self, eopatch):
         """
         See Task's docs for the explanation of what is done.
         """
         eopatch.vector_timeless[self.feature].rename(index=str, columns={"CropName": "crop_geopedia_idx"}, inplace=True)
-        eopatch.vector_timeless[self.feature] = pd.merge(eopatch.vector_timeless[self.feature],
-                                                         self.mapping,
-                                                         on='crop_geopedia_idx')
-        eopatch.vector_timeless[self.feature]['crop_geopedia_idx'] = eopatch.vector_timeless[self.feature]['PreCropName']
+        eopatch.vector_timeless[self.feature] = pd.merge(
+            eopatch.vector_timeless[self.feature], self.mapping, on="crop_geopedia_idx"
+        )
+        eopatch.vector_timeless[self.feature]["crop_geopedia_idx"] = eopatch.vector_timeless[self.feature][
+            "PreCropName"
+        ]
         self.mapping.rename(index=str, columns={"Crop Name": "PreCrop Name"}, inplace=True)
-        eopatch.vector_timeless[self.feature] = pd.merge(eopatch.vector_timeless[self.feature],
-                                                         self.mapping,
-                                                         on='crop_geopedia_idx')
-        eopatch.vector_timeless[self.feature].drop(['crop_geopedia_idx', 'PreCropName'], axis=1, inplace=True)
+        eopatch.vector_timeless[self.feature] = pd.merge(
+            eopatch.vector_timeless[self.feature], self.mapping, on="crop_geopedia_idx"
+        )
+        eopatch.vector_timeless[self.feature].drop(["crop_geopedia_idx", "PreCropName"], axis=1, inplace=True)
 
     def execute(self, eopatch):
-        if self.country == 'Slovenia':
+        if self.country == "Slovenia":
             self._fix_slovenian_lpis(eopatch)
-        elif self.country == 'Austria':
+        elif self.country == "Austria":
             self._fix_austrian_lpis(eopatch)
-        elif self.country == 'Denmark':
+        elif self.country == "Denmark":
             self._fix_danish_lpis(eopatch)
 
         return eopatch
@@ -582,6 +622,7 @@ class ValidDataFractionPredicate:
         coverage = np.sum(array.astype(np.uint8)) / np.prod(array.shape)
         return coverage > self.threshold
 
+
 class Sen2CorValidData:
     """
     Combine Sen2Cor's classification map with `IS_DATA` to define a valid data mask.
@@ -596,23 +637,28 @@ class Sen2CorValidData:
         self.dilation = dilation_radius
 
     def __call__(self, eopatch):
-        sen2cor_valid = np.zeros_like(eopatch.mask['SCL'], dtype=np.bool)
+        sen2cor_valid = np.zeros_like(eopatch.mask["SCL"], dtype=np.bool)
 
         for valid in self.valid:
-            sen2cor_valid = np.logical_or(sen2cor_valid, (eopatch.mask['SCL'] == valid))
+            sen2cor_valid = np.logical_or(sen2cor_valid, (eopatch.mask["SCL"] == valid))
 
         sen2cor_valid = sen2cor_valid.squeeze()
         if self.erosion:
             sen2cor_valid = np.logical_not(
-                np.asarray([binary_erosion(np.logical_not(mask), disk(self.erosion)) for mask in sen2cor_valid],
-                           dtype=np.bool))
+                np.asarray(
+                    [binary_erosion(np.logical_not(mask), disk(self.erosion)) for mask in sen2cor_valid], dtype=np.bool
+                )
+            )
 
         if self.dilation:
             sen2cor_valid = np.logical_not(
-                np.asarray([binary_dilation(np.logical_not(mask), disk(self.dilation)) for mask in sen2cor_valid],
-                           dtype=np.bool))
+                np.asarray(
+                    [binary_dilation(np.logical_not(mask), disk(self.dilation)) for mask in sen2cor_valid],
+                    dtype=np.bool,
+                )
+            )
 
-        return np.logical_and(eopatch.mask['IS_DATA'].astype(np.bool), sen2cor_valid[..., np.newaxis])
+        return np.logical_and(eopatch.mask["IS_DATA"].astype(np.bool), sen2cor_valid[..., np.newaxis])
 
 
 class AddGeopediaVectorFeature(EOTask):
@@ -646,7 +692,7 @@ class AddGeopediaVectorFeature(EOTask):
                 gdf = gdf.loc[gdf[self.year_col_name].isin([self.year])]
 
             if self.drop_duplicates:
-                sel = gdf.drop('geometry', axis=1)
+                sel = gdf.drop("geometry", axis=1)
                 sel = sel.drop_duplicates()
                 gdf = gdf.loc[sel.index]
 
