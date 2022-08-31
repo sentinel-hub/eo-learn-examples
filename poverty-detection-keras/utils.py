@@ -16,7 +16,6 @@ from keras.models import model_from_yaml
 # from pygeotile.tile import Tile
 
 
-
 def print_start_details(start_time):
     """Print config at the start of a run."""
     pp = pprint.PrettyPrinter(indent=4)
