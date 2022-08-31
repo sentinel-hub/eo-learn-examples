@@ -4,6 +4,7 @@ preview = true
 
 [tool.isort]
 profile = "black"
+known_first_party = ["sentinelhub", "eolearn", "eogrow", "hiector"]
 sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
 line_length = 120
 

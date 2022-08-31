@@ -7,6 +7,7 @@ get_s2_sentinelhub.py
 """
 
 import numpy as np
+
 from eolearn.core import EOPatch, EOTask, FeatureType, LinearWorkflow, LoadFromDisk, OverwritePermission, SaveToDisk
 
 

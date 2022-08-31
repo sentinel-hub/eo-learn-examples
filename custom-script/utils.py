@@ -2,6 +2,7 @@ import datetime as dt
 
 import matplotlib.pyplot as plt
 import numpy as np
+
 from sentinelhub import CRS, BBox, DataCollection, MimeType, SentinelHubRequest, SHConfig, bbox_to_dimensions
 
 PRECISION_SCORES = 4
