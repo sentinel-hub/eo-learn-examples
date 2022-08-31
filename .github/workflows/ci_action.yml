@@ -1,0 +1,31 @@
+name: build
+
+on:
+  push:
+
+jobs:
+
+  check-code-black-isort:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ env.CHECKOUT_BRANCH }}
+    
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+          architecture: x64
+
+      - name: Prepare linters
+        run: pip install black[jupyter] isort nbqa
+
+      - name: Check code compliance with black
+        run: black . --check --diff
+
+      - name: Check code compliance with isort
+        run: |
+          isort . --check --diff
+          nbqa isort . --nbqa-diff
