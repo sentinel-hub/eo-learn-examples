@@ -2,8 +2,7 @@
 
 In **CloudMaskTask** example we show how to obtain Sentinel-2 cloud masks with eo-learn.
 
-The simplest (and fastest) way is requesting cloud masks (and optionally cloud probabilities) from the Sentinel Hub service.
-In case provided cloud masks are not sufficient we also show how to use [s2cloudless](https://github.com/sentinel-hub/sentinel2-cloud-detector) to calculate your own.
+The simplest (and fastest) way is requesting cloud masks (and optionally cloud probabilities) from the Sentinel Hub service. In case provided cloud masks are not sufficient we also show how to use [s2cloudless](https://github.com/sentinel-hub/sentinel2-cloud-detector) to calculate your own.
 
 ## Installation
 
