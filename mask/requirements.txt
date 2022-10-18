@@ -1,0 +1,3 @@
+eo-learn==1.3.0
+jupyter==1.0.0
+sentinelhub==3.8.0
