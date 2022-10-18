@@ -1,6 +1,10 @@
 ## Introduction
 
-**Coregistration** 
+**Coregistration** example illustrates how to use a ```RegistrationTransform``` to temporally align the frames of an EOPatch using different algorithms:
+ + Thunder registration
+ + Enhanced Cross-Correlation 
+ + Point-Based Registration
+
 
 ## Installation
 
@@ -18,4 +22,3 @@ and run:
 ```
 $ jupyter notebook Coregistration.ipynb
 ```
-.
