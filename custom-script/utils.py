@@ -2,8 +2,10 @@ import datetime as dt
 
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn import metrics
 
-from sentinelhub import CRS, BBox, DataCollection, MimeType, SentinelHubRequest, SHConfig, bbox_to_dimensions
+from eolearn.core import FeatureType
+from sentinelhub import DataCollection, MimeType, SentinelHubRequest
 
 PRECISION_SCORES = 4
 PRECISION_THRESHOLD = None
@@ -12,6 +14,37 @@ BANDS = ["B02", "B03", "B04", "B08", "B11"]
 BANDS_STR = ",".join(BANDS)
 MODEL_INPUTS = ["B02", "B03", "B04", "NDWI", "NDMI"]
 MODEL_INPUTS_STR = ", ".join(MODEL_INPUTS)
+
+FEATURES_SAMPLED = FeatureType.DATA, "FEATURES_SAMPLED"
+IS_DATA_SAMPLED = FeatureType.MASK, "IS_DATA_SAMPLED"
+LABELS_SAMPLED = FeatureType.MASK_TIMELESS, "water_label_SAMPLED"
+
+
+def prepare_data(eopatches, gdf):
+    # Set the features and the labels for train and test sets
+    features_train = np.array([eopatch[FEATURES_SAMPLED] for eopatch in eopatches[gdf.isin_train.values]])
+    labels_train = np.array([eopatch[LABELS_SAMPLED] for eopatch in eopatches[gdf.isin_train.values]])
+    mask_train = np.array([eopatch[IS_DATA_SAMPLED] for eopatch in eopatches[gdf.isin_train.values]])
+
+    features_test = np.array([eopatch[FEATURES_SAMPLED] for eopatch in eopatches[~gdf.isin_train.values]])
+    labels_test = np.array([eopatch[LABELS_SAMPLED] for eopatch in eopatches[~gdf.isin_train.values]])
+    mask_test = np.array([eopatch[IS_DATA_SAMPLED] for eopatch in eopatches[~gdf.isin_train.values]])
+
+    # get shape
+    p1, t, w, h, f = features_train.shape
+    p2, t, w, h, f = features_test.shape
+
+    # reshape to n x m
+    features_train = np.moveaxis(features_train, 1, 3).reshape(p1 * w * h, t * f)
+    labels_train = np.moveaxis(labels_train, 1, 2).reshape(p1 * w * h, 1).squeeze()
+    mask_train = np.moveaxis(mask_train, 1, 2).reshape(p1 * w * h, 1).squeeze()
+
+    features_test = np.moveaxis(features_test, 1, 3).reshape(p2 * w * h, t * f)
+    labels_test = np.moveaxis(labels_test, 1, 2).reshape(p2 * w * h, 1).squeeze()
+    mask_test = np.moveaxis(mask_test, 1, 2).reshape(p2 * w * h, 1).squeeze()
+
+    # remove points with no valid data
+    return features_train[mask_train], labels_train[mask_train], features_test[mask_test], labels_test[mask_test]
 
 
 def parse_subtree(node, brackets=True):
@@ -40,7 +73,7 @@ def parse_subtree(node, brackets=True):
 
 def parse_one_tree(root, index):
     return f"""
-function pt{index}({MODEL_INPUTS_STR}) {{ 
+function pt{index}({MODEL_INPUTS_STR}) {{
    return {parse_subtree(root, brackets=False)};
 }}
 """
@@ -70,13 +103,13 @@ function setup() {{
 function evaluatePixel(sample) {{
     let NDWI = index(sample.B03, sample.B08);
     let NDMI = index(sample.B08, sample.B11);
-    
+
     return [predict(sample.B02, sample.B03, sample.B04, NDWI, NDMI)]
 }}
 
 {tree_functions}
 
-function predict({MODEL_INPUTS_STR}) {{ 
+function predict({MODEL_INPUTS_STR}) {{
     return [1/(1+Math.exp(-1*({function_sum})))];
 }}
 """
@@ -92,18 +125,6 @@ def parse_model(model, js_output_filename=None):
             f.write(model_javascript)
 
     return model_javascript
-
-
-def visualize(patch, factor=3.5):
-    fig, ax = plt.subplots(ncols=3, figsize=(22, 7))
-    ax[0].imshow(factor * patch.data["BANDS-S2-L1C"][0][..., [3, 2, 1]].squeeze())
-    ax[0].set_title(f"True color, {patch.timestamp[0]}")
-
-    ax[1].imshow(patch.data_timeless["DEM"].squeeze())
-    ax[1].set_title("DEM")
-
-    ax[2].imshow(patch.mask_timeless["water_label"].squeeze(), vmin=0, vmax=1)
-    ax[2].set_title("water mask")
 
 
 def predict_on_sh(model_script, bbox, size, timestamp, config):
@@ -124,25 +145,35 @@ def predict_on_sh(model_script, bbox, size, timestamp, config):
     return request.get_data()[0]
 
 
-def get_predictions(patch, model, config):
-    model_script = parse_model(model, None)
-    sh_prediction = predict_on_sh(model_script, patch.bbox, (64, 64), patch.timestamp[0], config)
+def print_rez(f1_scores, recall, precision, predict_labels_test, labels_test):
+    class_names = ["non-water", "water"]
 
-    features = patch.data["FEATURES"][0]
-    f_s = features.shape
-    model_prediction = model.predict_proba(features.reshape(f_s[0] * f_s[1], f_s[2]))[..., -1].reshape(f_s[0], f_s[1])
+    print("Classification accuracy {:.1f}%".format(100 * metrics.accuracy_score(labels_test, predict_labels_test)))
+    print(
+        "Classification F1-score {:.1f}% \n".format(
+            100 * metrics.f1_score(labels_test, predict_labels_test, average="weighted")
+        )
+    )
+    print("             Class              =  F1  | Recall | Precision")
+    print("         --------------------------------------------------")
+    for idx, classname in enumerate(class_names):
+        print(
+            "         * {0:20s} = {1:2.1f} |  {2:2.1f}  | {3:2.1f}".format(
+                classname, f1_scores[idx] * 100, recall[idx] * 100, precision[idx] * 100
+            )
+        )
 
-    return features[..., [2, 1, 000]], sh_prediction, model_prediction
 
-
-def plot_comparison(rgb_array, sh_prediction, model_prediction, threshold=0.5):
+def plot_comparison(patch, sh_prediction, model_prediction, threshold=0.5, factor=3.15):
     fig, ax = plt.subplots(nrows=2, ncols=4, figsize=(24, 12), sharex=True, sharey=True)
 
     for axx in ax.flatten():
         axx.set_xticks([])
         axx.set_yticks([])
 
-    ax[0][0].imshow(3.5 * rgb_array)
+    rgb_image = factor * patch.data["BANDS-S2-L1C"][0][..., [3, 2, 1]].squeeze()
+
+    ax[0][0].imshow(rgb_image)
     ax[0][0].set_title("RGB image")
 
     ax[0][1].imshow(sh_prediction, vmin=0, vmax=1)
@@ -155,7 +186,8 @@ def plot_comparison(rgb_array, sh_prediction, model_prediction, threshold=0.5):
     ax[0][3].set_title("differences between [a] and [b]", fontsize=14)
 
     sh_thr = np.where(sh_prediction > threshold, 1, 0)
-    ax[1][0].imshow(3.5 * rgb_array)
+
+    ax[1][0].imshow(rgb_image)
     ax[1][0].set_title("RGB image")
 
     ax[1][1].imshow(sh_thr, vmin=0, vmax=1)
@@ -166,6 +198,18 @@ def plot_comparison(rgb_array, sh_prediction, model_prediction, threshold=0.5):
     ax[1][2].set_title("[d] water prediction with model, locally", fontsize=14)
 
     ax[1][3].imshow(sh_thr - model_thr, vmin=-1, vmax=1, cmap="RdBu")
-    ax[1][3].set_title("differences between [d] and [d]", fontsize=14)
+    ax[1][3].set_title("differences between [c] and [d]", fontsize=14)
 
     plt.tight_layout(pad=0.05)
+
+
+def plot_visualize(patch, factor=3.15):
+    fig, ax = plt.subplots(ncols=3, figsize=(22, 7))
+    ax[0].imshow(factor * patch.data["BANDS-S2-L1C"][0][..., [3, 2, 1]].squeeze())
+    ax[0].set_title(f"True color, {patch.timestamp[0]}")
+
+    ax[1].imshow(patch.data_timeless["DEM"].squeeze())
+    ax[1].set_title("DEM")
+
+    ax[2].imshow(patch.mask_timeless["water_label"].squeeze(), vmin=0, vmax=1)
+    ax[2].set_title("water mask")
