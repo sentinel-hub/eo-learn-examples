@@ -145,7 +145,7 @@ def predict_on_sh(model_script, bbox, size, timestamp, config):
     return request.get_data()[0]
 
 
-def print_rez(f1_scores, recall, precision, predict_labels_test, labels_test):
+def print_results(f1_scores, recall, precision, predict_labels_test, labels_test):
     class_names = ["non-water", "water"]
 
     print("Classification accuracy {:.1f}%".format(100 * metrics.accuracy_score(labels_test, predict_labels_test)))
