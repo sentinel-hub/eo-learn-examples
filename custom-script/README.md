@@ -2,7 +2,7 @@
 
 In **Custom-script** example we show how  to create a Machine Learning (ML) custom-script for water detection.
 
-The example uses [eo-learn](https://eo-learn.readthedocs.io/en/latest/) to process the data and [LightGBM](https://lightgbm.readthedocs.io/en/latest/) to train a ML model for water classification given Seninel-2 band and index values. The resulting custom-script can be used in [the Sentinel Hub EOBrowser](https://www-test.sentinel-hub.com/explore/eobrowser/), in the [multi-temporal instance of Sentinel Playground](https://apps.sentinel-hub.com/sentinel-playground-temporal/?source=S2&lat=40.4&lng=-3.730000000000018&zoom=12&preset=1-NATURAL-COLOR&layers=B04,B03,B02&maxcc=20&gain=1.0&temporal=true&gamma=1.0&time=2015-01-01%7C2019-10-02&atmFilter=&showDates=false) and as evalscript in the [Sentinel Hub process API](https://docs.sentinel-hub.com/api/latest/api/process/).
+The example uses [eo-learn](https://eo-learn.readthedocs.io/en/latest/) to process the data and [LightGBM](https://lightgbm.readthedocs.io/en/latest/) to train a ML model for water classification given Seninel-2 band and index values. The resulting custom-script can be used in [the Sentinel Hub EOBrowser](https://apps.sentinel-hub.com/eo-browser/), in the [multi-temporal instance of Sentinel Playground](https://apps.sentinel-hub.com/sentinel-playground-temporal/?source=S2&lat=40.4&lng=-3.730000000000018&zoom=12&preset=1-NATURAL-COLOR&layers=B04,B03,B02&maxcc=20&gain=1.0&temporal=true&gamma=1.0&time=2015-01-01%7C2019-10-02&atmFilter=&showDates=false) and as evalscript in the [Sentinel Hub process API](https://docs.sentinel-hub.com/api/latest/api/process/).
 
 ## Installation
 
