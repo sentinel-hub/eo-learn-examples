@@ -17,12 +17,12 @@ BANDS_STR = ",".join(BANDS)
 MODEL_INPUTS = ["B02", "B03", "B04", "NDWI", "NDMI"]
 MODEL_INPUTS_STR = ", ".join(MODEL_INPUTS)
 
-FEATURES_SAMPLED = FeatureType.DATA, "FEATURES_SAMPLED"
-IS_DATA_SAMPLED = FeatureType.MASK, "IS_DATA_SAMPLED"
-LABELS_SAMPLED = FeatureType.MASK_TIMELESS, "water_label_SAMPLED"
-
 
 def prepare_data(eopatches: np.ndarray, train_eopatches: np.ndarray):
+    FEATURES_SAMPLED = FeatureType.DATA, "FEATURES_SAMPLED"
+    IS_DATA_SAMPLED = FeatureType.MASK, "IS_DATA_SAMPLED"
+    LABELS_SAMPLED = FeatureType.MASK_TIMELESS, "water_label_SAMPLED"
+
     # Set the features and the labels for train and test sets
     features_train = np.array([eopatch[FEATURES_SAMPLED] for eopatch in eopatches[train_eopatches]])
     labels_train = np.array([eopatch[LABELS_SAMPLED] for eopatch in eopatches[train_eopatches]])
