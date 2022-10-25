@@ -18,7 +18,7 @@ MODEL_INPUTS = ["B02", "B03", "B04", "NDWI", "NDMI"]
 MODEL_INPUTS_STR = ", ".join(MODEL_INPUTS)
 
 
-def prepare_data(eopatches: np.ndarray, train_eopatches: np.ndarray):
+def prepare_data(eopatches: np.ndarray, train_eopatches: np.ndarray) -> Tuple[np.ndarray]:
     FEATURES_SAMPLED = FeatureType.DATA, "FEATURES_SAMPLED"
     IS_DATA_SAMPLED = FeatureType.MASK, "IS_DATA_SAMPLED"
     LABELS_SAMPLED = FeatureType.MASK_TIMELESS, "water_label_SAMPLED"
@@ -49,7 +49,7 @@ def prepare_data(eopatches: np.ndarray, train_eopatches: np.ndarray):
     return features_train[mask_train], labels_train[mask_train], features_test[mask_test], labels_test[mask_test]
 
 
-def parse_subtree(node: Dict, brackets: bool = True):
+def parse_subtree(node: Dict, brackets: bool = True) -> str:
     if "leaf_index" in node:
         score = float(node["leaf_value"])
         if PRECISION_SCORES is not None:
@@ -73,7 +73,7 @@ def parse_subtree(node: Dict, brackets: bool = True):
     return result
 
 
-def parse_one_tree(root: Dict, index: int):
+def parse_one_tree(root: Dict, index: int) -> str:
     return f"""
 function pt{index}({MODEL_INPUTS_STR}) {{
    return {parse_subtree(root, brackets=False)};
