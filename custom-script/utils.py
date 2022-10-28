@@ -1,5 +1,5 @@
 import datetime as dt
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -78,6 +78,9 @@ def parse_subtree(node: dict, brackets: bool = True) -> str:
 
 
 def parse_one_tree(root: dict, index: int) -> str:
+    """
+    Parse one tree.
+    """
     return f"""
 function pt{index}({MODEL_INPUTS_STR}) {{
    return {parse_subtree(root, brackets=False)};
@@ -86,8 +89,11 @@ function pt{index}({MODEL_INPUTS_STR}) {{
 
 
 def parse_trees(trees: List) -> str:
-    tree_functions = "\n".join([parse_one_tree(tree["tree_structure"], idx) for idx, tree in enumerate(trees)])
-    function_sum = "+".join([f"pt{i}({MODEL_INPUTS_STR})" for i in range(len(trees))])
+    """
+    Parse trees into eval script.
+    """
+    tree_functions = "\n".join(parse_one_tree(tree["tree_structure"], idx) for idx, tree in enumerate(trees))
+    function_sum = "+".join(f"pt{i}({MODEL_INPUTS_STR})" for i in range(len(trees)))
 
     return f"""
 //VERSION=3
@@ -121,7 +127,10 @@ function predict({MODEL_INPUTS_STR}) {{
 """
 
 
-def parse_model(model: Any, js_output_filename: Any = None) -> str:
+def parse_model(model: Any, js_output_filename: Optional[str] = None) -> str:
+    """
+    Parse model for eval script.
+    """
     model_json = model.booster_.dump_model()
     model_javascript = parse_trees(model_json["tree_info"])
 
@@ -184,12 +193,11 @@ def print_results(
         "Classification F1-score"
         f" {100 * metrics.f1_score(labels_test, predict_labels_test, average='weighted'):.1f}% \n"
     )
-    print("             Class              =  F1  | Recall | Precision")
-    print("         --------------------------------------------------")
+    print("    Class    =  F1  | Recall | Precision")
+    print("----------------------------------------")
     for idx, classname in enumerate(class_names):
         print(
-            f"         * {classname:20s} = {f1_scores[idx] * 100:.1f} |  {recall[idx] * 100:.1f}  |"
-            f" {precision[idx] * 100:.1f}"
+            f"• {classname:10s} = {f1_scores[idx] * 100:.1f} |  {recall[idx] * 100:.1f}  | {precision[idx] * 100:.1f}"
         )
 
 
