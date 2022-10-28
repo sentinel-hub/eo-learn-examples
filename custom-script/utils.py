@@ -176,7 +176,7 @@ def print_results(
     labels_test: np.ndarray,
 ) -> None:
     """
-    Function prints results of learning model
+    Prints the statistics of model performance.
     """
     class_names = ["non-water", "water"]
     print(f"Classification accuracy {100 * metrics.accuracy_score(labels_test, predict_labels_test):.1f}%")
