@@ -221,7 +221,7 @@ def plot_comparison(
     rgb_image = factor * patch.data["BANDS-S2-L1C"][0][..., [3, 2, 1]]
 
     ax[0][0].imshow(rgb_image)
-    ax[0][0].set_title("RGB image")
+    ax[0][0].set_title("RGB image", fontsize=14)
 
     ax[0][1].imshow(sh_prediction, vmin=0, vmax=1)
     ax[0][1].set_title("[a] water prediction probabilities with evalscript on SH", fontsize=14)
@@ -235,7 +235,7 @@ def plot_comparison(
     sh_thr = np.where(sh_prediction > threshold, 1, 0)
 
     ax[1][0].imshow(rgb_image)
-    ax[1][0].set_title("RGB image")
+    ax[1][0].set_title("RGB image", fontsize=14)
 
     ax[1][1].imshow(sh_thr, vmin=0, vmax=1)
     ax[1][1].set_title("[c] water prediction with evalscript on SH", fontsize=14)
