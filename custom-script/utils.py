@@ -201,7 +201,7 @@ def plot_comparison(
     factor: float = 3.15,
 ) -> None:
     """
-    Function plot compare results of learning model locally with sh-py script
+    Plots a comparison of using the model locally and using it in an evalscript.
     """
 
     fig, ax = plt.subplots(nrows=2, ncols=4, figsize=(24, 12), sharex=True, sharey=True)
