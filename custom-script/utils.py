@@ -22,7 +22,7 @@ def prepare_data_helper(
     feature: Tuple[FeatureType, str],
 ) -> np.ndarray:
     """
-    Function that reshape data into np.array of correct dimensions
+    Function that reshapes data into a np.array of correct dimensions
     """
     tmp_data = np.array([eopatch[feature] for eopatch in array])
     if not feature[0].is_timeless():
