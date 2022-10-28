@@ -134,7 +134,7 @@ def parse_model(model: Any, js_output_filename: Any = None) -> str:
 
 def get_model_predictions(patch: EOPatch, model: Any) -> np.ndarray:
     """
-    Gets model results locally
+    Applies model to the features of the EOPatch.
     """
     features = patch.data["FEATURES"][0]
     height, width, nfeats = features.shape
