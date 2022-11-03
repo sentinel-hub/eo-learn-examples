@@ -1,9 +1,12 @@
 import datetime as dt
+from typing import Any, Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn import metrics
 
-from sentinelhub import CRS, BBox, DataCollection, MimeType, SentinelHubRequest, SHConfig, bbox_to_dimensions
+from eolearn.core import EOPatch, FeatureType
+from sentinelhub import DataCollection, MimeType, SentinelHubRequest, SHConfig
 
 PRECISION_SCORES = 4
 PRECISION_THRESHOLD = None
@@ -14,7 +17,43 @@ MODEL_INPUTS = ["B02", "B03", "B04", "NDWI", "NDMI"]
 MODEL_INPUTS_STR = ", ".join(MODEL_INPUTS)
 
 
-def parse_subtree(node, brackets=True):
+def prepare_data_helper(
+    array: List[EOPatch],
+    feature: Tuple[FeatureType, str],
+) -> np.ndarray:
+    """
+    Function that reshapes data into a np.array of correct dimensions
+    """
+    tmp_data = np.array([eopatch[feature] for eopatch in array])
+    if not feature[0].is_timeless():
+        p, t, w, h, f = tmp_data.shape
+        return np.moveaxis(tmp_data, 1, 3).reshape(p * w * h, t * f)
+
+    return tmp_data.flatten()
+
+
+def prepare_data(
+    train_eopatches: List[EOPatch],
+    test_eopatches: List[EOPatch],
+    features: Tuple[FeatureType, str],
+    is_data: Tuple[FeatureType, str],
+    labels: Tuple[FeatureType, str],
+) -> Dict[str, np.ndarray]:
+    """
+    Function prepare data from eopatches to correct np.array
+    """
+    mask_train = prepare_data_helper(train_eopatches, is_data)
+    mask_test = prepare_data_helper(test_eopatches, is_data)
+
+    return {
+        "features train": prepare_data_helper(train_eopatches, features)[mask_train],
+        "labels train": prepare_data_helper(train_eopatches, labels)[mask_train],
+        "features test": prepare_data_helper(test_eopatches, features)[mask_test],
+        "labels test": prepare_data_helper(test_eopatches, labels)[mask_test],
+    }
+
+
+def parse_subtree(node: dict, brackets: bool = True) -> str:
     if "leaf_index" in node:
         score = float(node["leaf_value"])
         if PRECISION_SCORES is not None:
@@ -38,17 +77,23 @@ def parse_subtree(node, brackets=True):
     return result
 
 
-def parse_one_tree(root, index):
+def parse_one_tree(root: dict, index: int) -> str:
+    """
+    Parse one tree.
+    """
     return f"""
-function pt{index}({MODEL_INPUTS_STR}) {{ 
+function pt{index}({MODEL_INPUTS_STR}) {{
    return {parse_subtree(root, brackets=False)};
 }}
 """
 
 
-def parse_trees(trees):
-    tree_functions = "\n".join([parse_one_tree(tree["tree_structure"], idx) for idx, tree in enumerate(trees)])
-    function_sum = "+".join([f"pt{i}({MODEL_INPUTS_STR})" for i in range(len(trees))])
+def parse_trees(trees: List) -> str:
+    """
+    Parse trees into eval script.
+    """
+    tree_functions = "\n".join(parse_one_tree(tree["tree_structure"], idx) for idx, tree in enumerate(trees))
+    function_sum = "+".join(f"pt{i}({MODEL_INPUTS_STR})" for i in range(len(trees)))
 
     return f"""
 //VERSION=3
@@ -70,21 +115,23 @@ function setup() {{
 function evaluatePixel(sample) {{
     let NDWI = index(sample.B03, sample.B08);
     let NDMI = index(sample.B08, sample.B11);
-    
+
     return [predict(sample.B02, sample.B03, sample.B04, NDWI, NDMI)]
 }}
 
 {tree_functions}
 
-function predict({MODEL_INPUTS_STR}) {{ 
+function predict({MODEL_INPUTS_STR}) {{
     return [1/(1+Math.exp(-1*({function_sum})))];
 }}
 """
 
 
-def parse_model(model, js_output_filename=None):
+def parse_model(model: Any, js_output_filename: Optional[str] = None) -> str:
+    """
+    Parse model for eval script.
+    """
     model_json = model.booster_.dump_model()
-
     model_javascript = parse_trees(model_json["tree_info"])
 
     if js_output_filename:
@@ -94,56 +141,87 @@ def parse_model(model, js_output_filename=None):
     return model_javascript
 
 
-def visualize(patch, factor=3.5):
-    fig, ax = plt.subplots(ncols=3, figsize=(22, 7))
-    ax[0].imshow(factor * patch.data["BANDS-S2-L1C"][0][..., [3, 2, 1]].squeeze())
-    ax[0].set_title(f"True color, {patch.timestamp[0]}")
-
-    ax[1].imshow(patch.data_timeless["DEM"].squeeze())
-    ax[1].set_title("DEM")
-
-    ax[2].imshow(patch.mask_timeless["water_label"].squeeze(), vmin=0, vmax=1)
-    ax[2].set_title("water mask")
+def get_model_predictions(patch: EOPatch, model: Any) -> np.ndarray:
+    """
+    Applies model to the features of the EOPatch.
+    """
+    features = patch.data["FEATURES"][0]
+    height, width, nfeats = features.shape
+    reshaped_features = features.reshape(height * width, nfeats)
+    return model.predict_proba(reshaped_features)[..., -1].reshape(height, width)
 
 
-def predict_on_sh(model_script, bbox, size, timestamp, config):
+def get_sh_predictions(patch: EOPatch, model: Any, config: SHConfig) -> np.ndarray:
+    """
+    Gets model results from sh-py
+    """
+    model_script = parse_model(model, None)
+
     request = SentinelHubRequest(
         evalscript=model_script,
         input_data=[
             SentinelHubRequest.input_data(
                 data_collection=DataCollection.SENTINEL2_L1C,
-                time_interval=(timestamp - dt.timedelta(minutes=5), timestamp + dt.timedelta(minutes=5)),
+                time_interval=(
+                    patch.timestamp[0] - dt.timedelta(minutes=5),
+                    patch.timestamp[0] + dt.timedelta(minutes=5),
+                ),
                 maxcc=1,
             )
         ],
         responses=[SentinelHubRequest.output_response("default", MimeType.TIFF)],
-        bbox=bbox,
-        size=size,
+        bbox=patch.bbox,
+        size=(64, 64),
         config=config,
     )
     return request.get_data()[0]
 
 
-def get_predictions(patch, model, config):
-    model_script = parse_model(model, None)
-    sh_prediction = predict_on_sh(model_script, patch.bbox, (64, 64), patch.timestamp[0], config)
+def print_results(
+    f1_scores: np.ndarray,
+    recall: np.ndarray,
+    precision: np.ndarray,
+    predict_labels_test: np.ndarray,
+    labels_test: np.ndarray,
+) -> None:
+    """
+    Prints the statistics of model performance.
+    """
+    class_names = ["non-water", "water"]
+    print(f"Classification accuracy {100 * metrics.accuracy_score(labels_test, predict_labels_test):.1f}%")
+    print(
+        "Classification F1-score"
+        f" {100 * metrics.f1_score(labels_test, predict_labels_test, average='weighted'):.1f}% \n"
+    )
+    print("    Class    =  F1  | Recall | Precision")
+    print("----------------------------------------")
+    for idx, classname in enumerate(class_names):
+        print(
+            f"• {classname:10s} = {f1_scores[idx] * 100:.1f} |  {recall[idx] * 100:.1f}  | {precision[idx] * 100:.1f}"
+        )
 
-    features = patch.data["FEATURES"][0]
-    f_s = features.shape
-    model_prediction = model.predict_proba(features.reshape(f_s[0] * f_s[1], f_s[2]))[..., -1].reshape(f_s[0], f_s[1])
 
-    return features[..., [2, 1, 000]], sh_prediction, model_prediction
+def plot_comparison(
+    patch: EOPatch,
+    sh_prediction: np.ndarray,
+    model_prediction: np.ndarray,
+    threshold: float = 0.5,
+    factor: float = 3.15,
+) -> None:
+    """
+    Plots a comparison of using the model locally and using it in an evalscript.
+    """
 
-
-def plot_comparison(rgb_array, sh_prediction, model_prediction, threshold=0.5):
     fig, ax = plt.subplots(nrows=2, ncols=4, figsize=(24, 12), sharex=True, sharey=True)
 
     for axx in ax.flatten():
         axx.set_xticks([])
         axx.set_yticks([])
 
-    ax[0][0].imshow(3.5 * rgb_array)
-    ax[0][0].set_title("RGB image")
+    rgb_image = factor * patch.data["BANDS-S2-L1C"][0][..., [3, 2, 1]]
+
+    ax[0][0].imshow(rgb_image)
+    ax[0][0].set_title("RGB image", fontsize=14)
 
     ax[0][1].imshow(sh_prediction, vmin=0, vmax=1)
     ax[0][1].set_title("[a] water prediction probabilities with evalscript on SH", fontsize=14)
@@ -155,8 +233,9 @@ def plot_comparison(rgb_array, sh_prediction, model_prediction, threshold=0.5):
     ax[0][3].set_title("differences between [a] and [b]", fontsize=14)
 
     sh_thr = np.where(sh_prediction > threshold, 1, 0)
-    ax[1][0].imshow(3.5 * rgb_array)
-    ax[1][0].set_title("RGB image")
+
+    ax[1][0].imshow(rgb_image)
+    ax[1][0].set_title("RGB image", fontsize=14)
 
     ax[1][1].imshow(sh_thr, vmin=0, vmax=1)
     ax[1][1].set_title("[c] water prediction with evalscript on SH", fontsize=14)
@@ -166,6 +245,6 @@ def plot_comparison(rgb_array, sh_prediction, model_prediction, threshold=0.5):
     ax[1][2].set_title("[d] water prediction with model, locally", fontsize=14)
 
     ax[1][3].imshow(sh_thr - model_thr, vmin=-1, vmax=1, cmap="RdBu")
-    ax[1][3].set_title("differences between [d] and [d]", fontsize=14)
+    ax[1][3].set_title("differences between [c] and [d]", fontsize=14)
 
-    plt.tight_layout(pad=0.05)
+    plt.tight_layout(pad=0.4, w_pad=0.5, h_pad=2.0)
