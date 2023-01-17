@@ -1,3 +1,9 @@
+# GEM-ML
+**/results/
+**/cache/
+**/*.tif
+**/*.dill
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
