@@ -20,7 +20,7 @@
 # # Data Acquisition
 # Here, we define our `EOWorkflow` for the download of our desired data.
 
-# In[1]:
+# In[32]:
 
 
 import os
@@ -29,13 +29,14 @@ import platform
 import numpy as np
 import datetime as dt
 import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
 import time
 import natsort
 
-# import torch
-# import torch.multiprocessing as mp
-# from tensorboardX import SummaryWriter
-# from tensorboard import notebook
+import torch
+import torch.multiprocessing as mp
+from tensorboardX import SummaryWriter
+from tensorboard import notebook
 
 from sentinelhub import SHConfig, BBox, CRS, DataCollection, UtmZoneSplitter, DataCollection
 from eolearn.core import FeatureType, EOPatch, MergeEOPatchesTask, MapFeatureTask, MergeFeatureTask, ZipFeatureTask, LoadTask, EONode, EOWorkflow, EOExecutor, OverwritePermission, SaveTask
@@ -48,20 +49,20 @@ import rasterio
 import geopandas as gpd
 import pandas as pd
 from shapely.geometry import Polygon,Point
-# import folium
-# from folium import plugins as foliumplugins
+import folium
+from folium import plugins as foliumplugins
 
 from libs.ConfigME import Config, importME
-# from libs.MergeTDigests import mergeTDigests
-# from libs.QuantileScaler_eolearn import QuantileScaler_eolearn_tdigest
-# from libs.Dataset_eolearn import Dataset_eolearn
-# from libs import AugmentME
+from libs.MergeTDigests import mergeTDigests
+from libs.QuantileScaler_eolearn import QuantileScaler_eolearn_tdigest
+from libs.Dataset_eolearn import Dataset_eolearn
+from libs import AugmentME
 from libs import ExecuteME
 
 from tasks.TDigestTask import TDigestTask
 from tasks.PickIdxTask import PickIdxTask
 from tasks.SaveValidTask import SaveValidTask
-# from tasks.PyTorchTasks import ModelForwardTask
+from tasks.PyTorchTasks import ModelForwardTask
 
 from utils.rasterio_reproject import rasterio_reproject
 from utils.transforms import batchify, predict, mover, Torchify
@@ -75,7 +76,7 @@ print("Executable:",sys.executable)
 # # Config
 # First, we load our configuration file which provides all information we need throughout the script.
 
-# In[2]:
+# In[33]:
 
 
 #%% load configuration file
@@ -85,7 +86,7 @@ config = Config.LOAD("config.dill")
 # # Area of Interest
 # Let's load the geojson of our area of interests for training, validation and testing, respectively.
 
-# In[3]:
+# In[34]:
 
 
 #%% load geojson files
@@ -114,7 +115,7 @@ aois = {"train":aoi_train,
 
 # Since our **area of interests are too large**, we **split** them into a set of smaller bboxes.
 
-# In[4]:
+# In[35]:
 
 
 #%% calculate and print size
@@ -158,7 +159,7 @@ info_lists = {"train":info_list_train,
 # Unfortunately, **geopandas does not support multiple crs in one dataframe** as described [here](https://github.com/sentinel-hub/sentinelhub-py/issues/123).
 # Hence, we have to define a set of tiles for each separately.
 
-# In[5]:
+# # In[36]:
 
 
 # tiles = []
@@ -197,15 +198,15 @@ info_lists = {"train":info_list_train,
 #         tiles[-1][-1].to_file(os.path.join(config["dir_results"],f"grid_aoi_{_}_{i}_EPSG{str(crss_unique[i]._value_)}.gpkg"), driver="GPKG")
 
 
-# We have sorted the tiles according to their corresponding crs.
-# Now we want to visualize it in a nice map.
-# Here, it is important to **reproject the tiles** to the crs of our **mapping application** - we do that only for this purpose, the **bbox list is not affected** by this.
+# # We have sorted the tiles according to their corresponding crs.
+# # Now we want to visualize it in a nice map.
+# # Here, it is important to **reproject the tiles** to the crs of our **mapping application** - we do that only for this purpose, the **bbox list is not affected** by this.
 
-# In[6]:
+# # In[37]:
 
 
-#%% print amount of patches
-print("Total number of tiles:",[len(bbox_list) for bbox_list in bbox_lists.values()])
+# #%% print amount of patches
+# print("Total number of tiles:",[len(bbox_list) for bbox_list in bbox_lists.values()])
 
 # #%% visualize using folium
 # aoi_folium = aoi_validation.to_crs("EPSG:4326") # use validation for visualisation
@@ -275,7 +276,7 @@ print("Total number of tiles:",[len(bbox_list) for bbox_list in bbox_lists.value
 # The date of our reference is considered to be the 2021-12-31.
 # That is, we choose the observation with `config["maxcc"]` cloud coverage closest to that date.
 
-# In[7]:
+# In[38]:
 
 
 #%% Sentinel-Hub-Input-Task
@@ -302,7 +303,7 @@ task_data = SentinelHubInputTask(
 # In order to get the closest observation with respect to our observation date, we pick the last one only.
 # Actually, we do not need that since we will query for the correct timeinterval before downloading but for the sake of safety, we use the `PickIdxTask` here.
 
-# In[8]:
+# In[39]:
 
 
 #%% Pick-Idx-Task
@@ -315,7 +316,7 @@ task_data_pick = PickIdxTask(
 
 # The same holds true for both our data- and the cloud-mask.
 
-# In[9]:
+# In[40]:
 
 
 #%% Pick-Idx-Task data mask
@@ -336,7 +337,7 @@ task_data_pick_cmask = PickIdxTask(
 # For the normalization of our dataset we will use the T-Digest algorithm.
 # It is designed for quantile approximation close to the tails which we need for the common linear quantile scaler in the realm of ML.
 
-# In[10]:
+# In[41]:
 
 
 #%% T-Digest-Task
@@ -353,7 +354,7 @@ task_data_tdigest = TDigestTask(
 # To enable the user to use other thresholds after downloading the patches, the raw NDWI and the corresponding bands will be stored within the `EOPatch` as well.
 # Additionally, we will download the RGB bands for visualisation purposes.
 
-# In[11]:
+# In[42]:
 
 
 #%% Import-From-Tiff-Task
@@ -367,14 +368,15 @@ task_reference = ImportFromTiffTask(
 
 # We apply our labelmapping using the [MapFeatureTask](https://eo-learn.readthedocs.io/en/latest/_modules/eolearn/core/core_tasks.html#MapFeatureTask).
 
-# In[12]:
+# In[43]:
 
 
 #%% apply labelmapping
 def labelmapper(reference,mapping):
+    refcopy = reference.copy()
     for key,value in mapping.items():
-        reference[reference==key] = value
-    return reference
+        refcopy[reference==key] = value
+    return refcopy
 task_reference_labelmapping = MapFeatureTask(
     input_features = (FeatureType.MASK_TIMELESS, "reference"),
     output_features = (FeatureType.MASK_TIMELESS, "reference"),
@@ -385,7 +387,7 @@ task_reference_labelmapping = MapFeatureTask(
 
 # Since the reference data has been acquired using the Landsat missions with 30m resolution, we have to resize our reference to our chosen resolution first.
 
-# In[13]:
+# In[44]:
 
 
 task_reference_resize = SpatialResizeTask(
@@ -399,7 +401,7 @@ task_reference_resize = SpatialResizeTask(
 # Further, we want our model to segment clouds as well.
 # Hence, we have to apply some mapping again using the [ZipFeatureTask](https://eo-learn.readthedocs.io/en/latest/_modules/eolearn/core/core_tasks.html#ZipFeatureTask) as we combine two features to one.
 
-# In[14]:
+# In[45]:
 
 
 def mask_key_value_zipper(*arrays,key=0,value=0):
@@ -427,7 +429,7 @@ task_reference_cloudmapping = ZipFeatureTask(
 # For the sake of simplicity we want to **filter out every sample of the input not providing the full data**.
 # This filtering will be done based on the analysis of the [MapFeatureTask](https://eo-learn.readthedocs.io/en/latest/_modules/eolearn/core/core_tasks.html#MapFeatureTask) applied to the dataMask.
 
-# In[15]:
+# In[46]:
 
 
 #%% Filter out incomplete input data patches
@@ -442,7 +444,7 @@ task_data_check = MapFeatureTask(
 
 # For the indefinite land cover in our reference data, we calculate a mask using the [MapFeatureTask](https://eo-learn.readthedocs.io/en/latest/_modules/eolearn/core/core_tasks.html#MapFeatureTask).
 
-# In[16]:
+# In[47]:
 
 
 #%% apply labelmapping
@@ -462,7 +464,7 @@ task_reference_mask = MapFeatureTask(
 # **Only valid EOPatches are saved** using the [Save-Valid-Task]() based on the citerion regarding the input data availability.
 # Note the **compression** keyword - if not set, the memory consumption may get really large!
 
-# In[17]:
+# In[48]:
 
 
 #%% save EOPatches
@@ -499,7 +501,7 @@ task_save = SaveValidTask(
 # ## Define Nodes
 # Let's initialise the nodes we will use for our workflow afterwards.
 
-# In[18]:
+# In[49]:
 
 
 #%% input nodes
@@ -573,33 +575,35 @@ node_save = EONode(
 # Now, we finally can define a workflow based on our tasks and nodes.
 # We could either put every single node in the constructor using a list or define our whole workflow by just the last node: `node_save`.
 
-# In[19]:
+# In[50]:
 
 
 workflow = EOWorkflow.from_endnodes(node_save)
 #workflow.dependency_graph()
 
 
+# ## Test Workflow
+# Now, we want to test our workflow with some arbitrary patch (from our training set) at some arbitrary date (not included into study).
+
+# In[51]:
+
 if __name__=="__main__":
-    # ## Test Workflow
-    # Now, we want to test our workflow with some arbitrary patch (from our training set) at some arbitrary date (not included into study).
-    
-    # In[20]:
     workflow.execute({
         node_data: {"bbox":bbox_list_train[596],"time_interval":("2022-10-01","2022-10-01")},
         node_save: {"eopatch_folder":"testpatch"}
     })
     eopatch = EOPatch.load(os.path.join(config["dir_data"],"testpatch"))
     eopatch
-    
-    
+
+
     # Let's have a look at our eopatch.
-    
-    # In[21]:
-    
-    
+
+    # In[55]:
+
+
     RGB = eopatch["data"]["data"][0,...,np.array([2,1,0])].transpose(1,2,0)
-    
+    cmap = ListedColormap(["white","blue","darkgreen","orange","black"])
+
     #%% plot testpatch
     plt.figure()
     plt.subplot(221)
@@ -607,7 +611,7 @@ if __name__=="__main__":
     plt.title("RGB")
     plt.axis("off")
     plt.subplot(222)
-    plt.imshow(eopatch["mask_timeless"]["reference"],vmin=0,vmax=config["num_classes"]-1,cmap="Dark2")
+    plt.imshow(eopatch["mask_timeless"]["reference"],vmin=0,vmax=config["num_classes"],cmap=cmap)
     plt.title("Reference")
     plt.axis("off")
     plt.subplot(223)
@@ -618,19 +622,20 @@ if __name__=="__main__":
     plt.imshow(eopatch["mask_timeless"]["mask_reference"],vmin=0,vmax=1,cmap="RdYlGn")
     plt.title("Mask")
     plt.axis("off")
-    
-    plt.savefig("testpatch.png",dpi=300)
-    
-    
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(config["dir_imgs"],"testpatch.png"),dpi=300)
+
+
     # # Workflow Arguments
     # Now it's time to download the data.
     # Therefore, we have to define workflow arguments, both temporal and spatially.
     # Note that we only want to download the data which does not exist on our device.
     # Hence, we check for existence first and assign arguments afterwards.
-    
+
     # In[22]:
-    
-    
+
+
     workflow_args = []
     for _ in ["train","validation","test"]:
         print(_)
@@ -648,7 +653,7 @@ if __name__=="__main__":
                     maxcc = config["maxcc"], 
                     config = config["SHconfig"]
                 )
-    
+
                 dir_ = f"{_}/eopatch_{i}_{timestamps[0].strftime(r'%Y-%m-%dT%H-%M-%S_%Z')}_{timestamps[1].strftime(r'%Y-%m-%dT%H-%M-%S_%Z')}"
                 if not os.path.exists(os.path.join(config["dir_data"],dir_)):### and False: ### 
                     workflow_args.append(
@@ -660,73 +665,73 @@ if __name__=="__main__":
             except Exception as e:
                 print(e)
         print()
-    
+
     print(f"Number of downloads: {len(workflow_args)}")
-    
-    
+
+
     # In[23]:
-    
-    
+
+
     workflow_args[-1]
-    
-    
+
+
     # # Executor
     # Our area of interest has been defined, our desired data has been defined, our workflow has been defined, our execution arguments have been defined, our executor...
     # This has to be done!
-    
+
     # In[24]:
-    
-    
+
+
     #%% define executor
     executor = EOExecutor(workflow, workflow_args, save_logs=True)
-    
-    
+
+
     # Let it run!
     # That may take a while...
-    
+
     # In[25]:
-    
-    
+
+
     #%% run
     print(f"Will start data acquisition using {config['threads']} threads!")
     executor.run(workers=config["threads"])
     executor.make_report()
-    
-    
+
+
     # # Downloaded Data
     # After a long time, our executor finished with it's work.
     # Let's **check** if there happened anything unexpected.
-    
+
     # In[26]:
-    
-    
+
+
     failed_ids = executor.get_failed_executions()
     if failed_ids:
         print(
             f"Execution failed EOPatches with IDs:\n{failed_ids}\n"
             f"For more info check report at {executor.get_report_path()}"
         )
-    
-    
+
+
     # Let's have a look how many `EOPatches` got stored to disk.
-    
+
     # In[27]:
-    
-    
+
+
     print(f"Number of stored train EOPatches: {len(os.listdir(config['dir_train']))}")
     print(f"Number of stored validation EOPatches: {len(os.listdir(config['dir_validation']))}")
     print(f"Number of stored test EOPatches: {len(os.listdir(config['dir_test']))}")
     print()
     print(f"Number of downloads: {len(workflow_args)}")
     print(f"Total number of EOPatches: {len(os.listdir(config['dir_train']))+len(os.listdir(config['dir_validation']))+len(os.listdir(config['dir_test']))}")
-    
-    
+
+
     # We finally made it!
     # Everything is ready for being used!
-    
+
     # In[28]:
-    
-    
+
+
     print(FeatureType.DATA.ndim())
     print(FeatureType.DATA_TIMELESS.ndim())
     print(FeatureType.LABEL.ndim())
@@ -737,10 +742,10 @@ if __name__=="__main__":
     print(FeatureType.SCALAR_TIMELESS.ndim())
     print(FeatureType.VECTOR.ndim())
     print(FeatureType.VECTOR_TIMELESS.ndim())
-    
-    
+
+
     # In[ ]:
-    
-    
-    
-    
+
+
+
+
