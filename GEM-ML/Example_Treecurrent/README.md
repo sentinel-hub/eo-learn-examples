@@ -1,5 +1,5 @@
 ## Treecurrent
-This example showcases the prediction of vegetation growth using a recurrent network and `eolearn`.
+This example showcases the prediction of vegetation growth using a recurrent network.
 Using eight consecutive observations with at least two weeks time difference as input,
 a Convolutional LSTM predicts the **NDVI** of the 9th observation.
 
