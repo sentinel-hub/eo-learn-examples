@@ -8,6 +8,8 @@ The input data consists of patches of southern Bavaria:
 - bands B02, B03, B04, B08, B8A, B11
 - train: blue | val: green | test: red
 
+Reference timestamps were queried from the time interval `[2021-01-01, 2022-01-01]`.
+
 ![AOI Bavaria](example_aoi_bavaria.png)
 
 The NDVI references are calculated from bands B04 and B08. Additionally, masks for the 
