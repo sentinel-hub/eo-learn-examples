@@ -20,7 +20,7 @@ For example, eo-learn on Windows machines asks for specific WHLs do be downloade
 PyTorch, however, asks for hardware specific versions of CUDA.
 
 ## Authors
-Michael Engel (m.engel@tum.de)
-Colin Moldenhauer (colin.moldenhauer@tum.de)
-Niklas Eisl (niklas.eisl@tum.de)
-Joana Reuss (joana.reuss@tum.de)
+- Michael Engel (m.engel@tum.de)
+- Colin Moldenhauer (colin.moldenhauer@tum.de)
+- Niklas Eisl (niklas.eisl@tum.de)
+- Joana Reuss (joana.reuss@tum.de)
