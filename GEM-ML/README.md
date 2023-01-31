@@ -10,14 +10,16 @@ In contrast to toy examples, that asks for an appropriate infrastructure.
 That infrastructure is presented in the following.
 
 ## Examples
-### Deforestation Detection based on Sentinel-2 (Example_DeforestationDetection)
-### NDVI Prediction based on Sentinel-2 (Example_Treecurrent)
-### Water Segmentation based on Sentinel-1 (Example_WaterSegmentation)
+- Deforestation Detection based on Sentinel-2 (Example_DeforestationDetection)
+- NDVI Prediction based on Sentinel-2 (Example_Treecurrent)
+- Water Segmentation based on Sentinel-1 (Example_WaterSegmentation)
 
 ## Installation
+In general, we tested everything using pip and not conda.
 We provide a requirements.txt file but we highly recomment installing eo-learn and PyTorch separately according to their documentations.
 For example, eo-learn on Windows machines asks for specific WHLs do be downloaded.
 PyTorch, however, asks for hardware specific versions of CUDA.
+Further, you have to install the whole directory by using "pip install -e 'path to directory'".
 
 ## Authors
 - Michael Engel (m.engel@tum.de)
