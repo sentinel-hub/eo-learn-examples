@@ -82,13 +82,13 @@ def visualize_timestamp_deltas(diffs, target_delta):
 
 def plot_samples(
         eopatches,
-        samples=10,
         feature_data=(FeatureType.DATA, "reference_data"),
         feature_reference=(FeatureType.DATA, "reference"),
-        feature_mask=(FeatureType.MASK, "mask_reference")
+        feature_mask=(FeatureType.MASK, "mask_reference"),
+        figscale=5
 ):
     n_col = 3  # true color, reference, mask
-    fig, axs = plt.subplots(len(eopatches), n_col, figsize=(samples * n_col, samples * len(eopatches)))
+    fig, axs = plt.subplots(len(eopatches), n_col, figsize=(figscale * n_col, figscale * len(eopatches)))
     plt.subplots_adjust(wspace=.3, hspace=.1)
     if len(eopatches) == 1: axs = np.expand_dims(axs, 0)
 
@@ -106,7 +106,9 @@ def plot_samples(
         if feature_mask in patch:
             mask = patch[feature_mask][0, ...]
             pcolor = ax_mask.imshow(mask, vmin=0, vmax=1)
-            plt.colorbar(pcolor, ax=ax_mask, aspect=10)
-            ax_mask.set_title("mask: valid = 1, invalid = 0")
+            cbar = plt.colorbar(pcolor, ax=ax_mask, aspect=10, fraction=.09,
+                                boundaries=[0,1,2], values=[0,1], ticks=[.5, 1.5])
+            cbar.ax.set_yticklabels(["0: invalid", "1: valid"])
+            ax_mask.set_title("mask")
 
     return fig
