@@ -1,6 +1,7 @@
 ### Michael Engel ### 2022-10-06 ### parse_time_interval_observations.py ###
-from typing import Optional
+from typing import Optional, Tuple, List, Iterable, Callable
 from sentinelhub import BBox, DataCollection, SHConfig
+from sentinelhub.time_utils import TimeType
 from eolearn.io import get_available_timestamps
 import numpy as np
 import datetime as dt
@@ -117,3 +118,21 @@ def parse_time_interval_observations(time_interval,
                     end_relevant = timestamps[-1]
         
         return (start_relevant,end_relevant)
+
+
+def filter_times_reverse_n_obs(timestamps: Iterable[TimeType],
+                               time_difference: dt.timedelta,   # obsolete parameter to support sentinelhub_process.get_available_timestamps signature)
+                               time_difference_observations: dt.timedelta,
+                               n_obs: int) -> List[TimeType]:
+    timestamps = sorted(set(timestamps))[::-1]
+
+    filtered_timestamps: List[TimeType] = []
+
+    for current_timestamp in timestamps:
+        if not filtered_timestamps or filtered_timestamps[-1] - current_timestamp > time_difference_observations:
+            filtered_timestamps.append(current_timestamp)
+            if len(filtered_timestamps) == n_obs:
+                break
+
+    assert len(filtered_timestamps) == n_obs
+    return filtered_timestamps[::-1]

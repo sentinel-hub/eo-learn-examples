@@ -888,3 +888,16 @@ def runME(cmd,shell=False):
             print(output.strip())
     rc = process.poll()
     return rc
+
+
+def get_most_recent_config(config_dir, pattern="config_.*[.]dill", mode="m"):
+    method = os.path.getmtime if mode == "m" else os.path.getctime
+
+    all_files = os.listdir(config_dir)
+    configs = [file for file in all_files if re.search(pattern, file)]
+    if not len(configs): raise ValueError(f"No configs found for given pattern '{pattern}'")
+
+    times = [method(config_file) for config_file in configs]
+    max_index = np.argmax(times)
+
+    return configs[max_index]
