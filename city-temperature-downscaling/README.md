@@ -2,7 +2,8 @@
 
 Responsible: Nico Bader
 
-This demonstrates how to extract the structure of a city's temperature field by using satellite data. A slide set shows how this gets combined with weather data to generate e.g. urban heat island maps. That process will be made available via a meteoblue API that returns a heat map for the selected hour on a selected day and the notebook will be updated accordingly.
+This repository demonstrates how to extract the structure of a city's temperature field by using satellite data (Step I). A slide set shows how this gets combined with weather data to generate e.g. urban heat island maps (Step 2). That process will be made available via a meteoblue API that returns a heat map for the selected hour on a selected day and the notebook will be updated accordingly.
+
 
 # I) Satellite pre-processing
 
