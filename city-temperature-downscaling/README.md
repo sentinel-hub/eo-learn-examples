@@ -60,8 +60,11 @@ To understand how the satellite pre-processing works, you can use the jupyter no
 The satellite processing will be explained step-by-step.
 
 Before running the example notebook, please download the example data (city: Chicago, USA) and store it into the directories
-*data/satellite/* (if you haven't stored the DEM data before).
-The example can be found under the following links ...:
+*data/satellite/*.
+The example can be found under the following link:
+
+https://meteoblue.sharepoint.com/:f:/s/External/ElIddi0pudFOo5fQLPn8W64BWpWojtj-lny0NbbgY7HLbA?e=EPtGHM
+
 
 There are two files in the satellite data folder:
 - *LC09_...* (Landsat 8 raw data)
