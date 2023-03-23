@@ -53,13 +53,6 @@ Create a output directory where the netCDF files will be stored.
 mkdir output
 ```
 
-Create two new directories *data/DEM/* and *data/satellite/* where the DEM data and the satellite data can be stored.
-
-```
-cd data
-mkdir DEM
-mkdir satellite
-```
 
 ## Run the example jupyter notebook
 
@@ -67,7 +60,7 @@ To understand how the satellite pre-processing works, you can use the jupyter no
 The satellite processing will be explained step-by-step.
 
 Before running the example notebook, please download the example data (city: Chicago, USA) and store it into the directories
-*data/satellite/* and *data/DEM/* (if you haven't stored the DEM data before).
+*data/satellite/* (if you haven't stored the DEM data before).
 The example can be found under the following links ...:
 
 There are two files in the satellite data folder:
