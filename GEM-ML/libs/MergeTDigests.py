@@ -4,11 +4,14 @@ import dill as pickle
 import uuid
 from .ReduceME import reduce_BinaryTree
 
-from eolearn.core import EOPatch
+from typing import Iterable, Tuple
+
+from eolearn.core import EOPatch, FeatureType
+
 
 #%% define merger for TDigests
 class _Merger:
-    def __init__(self, feature, mode="dill", assumetmpfiles=True):
+    def __init__(self, feature: Tuple[FeatureType, str], mode: str = "dill", assumetmpfiles: bool = True):
         self.feature = feature
         self.mode = mode
         self.assumetmpfiles = assumetmpfiles
@@ -51,7 +54,12 @@ class _Merger:
         return tdigest
 
 #%% mergeTDigests
-def mergeTDigests(paths, feature, threads=0, checkthreads=True, bequiet=False):
+def mergeTDigests(
+        paths: Iterable[str],
+        feature: Tuple[FeatureType, str],
+        threads: int = 0,
+        checkthreads: bool = True,
+        bequiet: bool = False):
     Merger = _Merger(feature=feature, mode="dill", assumetmpfiles=True)
     tdigestarray_merged_pickle = reduce_BinaryTree(
         samples = paths,
