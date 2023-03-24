@@ -1,12 +1,21 @@
 ### Michael Engel ### 2022-04-29 ### SaveValidTask.py ###
-from eolearn.core import SaveTask
+from typing import Union, Tuple, Optional
+
+from fs.base import FS
+from eolearn.core import SaveTask, FeatureType, EOPatch
+from sentinelhub import SHConfig
 import numpy as np
 
 class SaveValidTask(SaveTask):
     """
     A class for saving an EOPatch if the chosen feature is True.
     """
-    def __init__(self,feature_to_check,path,filesystem=None,config=None,**kwargs):
+    def __init__(self,
+                 feature_to_check: Union[str, Tuple[FeatureType, str]],
+                 path: str,
+                 filesystem: Optional[FS] = None,
+                 config: Optional[SHConfig] = None,
+                 **kwargs):
         """
         :param feature_to_check: Type of EOPatch feature and name of feature to be checked.
         :type feature_to_check: (FeatureType, str)
@@ -36,7 +45,7 @@ class SaveValidTask(SaveTask):
         self.feature_to_check = self.parse_feature(feature_to_check)
         pass
     
-    def execute(self, eopatch,*args,eopatch_folder="",**kwargs):
+    def execute(self, eopatch: EOPatch,  eopatch_folder: Optional[str] = "", *args, **kwargs) -> EOPatch:
         """
         Execute method that checks feature for suitability and saves EOPatch if True.
         

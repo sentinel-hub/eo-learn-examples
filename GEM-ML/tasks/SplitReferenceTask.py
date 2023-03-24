@@ -1,8 +1,12 @@
-from eolearn.core import EOTask, FeatureType
+from typing import Tuple, Optional
+
+from eolearn.core import EOTask, FeatureType, EOPatch
 
 
 class SplitReferenceTask(EOTask):
-    def __init__(self, feature_in, feature_out=None, remove_feature_in=False):
+    def __init__(self, feature_in: Tuple[FeatureType, str],
+                 feature_out: Optional[Tuple[FeatureType, str]] = None,
+                 remove_feature_in: bool = False):
         """
         Splits a time series into two series: an observational time series and a corresponding reference series.
         :param feature_in: Feature containing the whole series
@@ -19,7 +23,7 @@ class SplitReferenceTask(EOTask):
 
         self.remove_feature_in = remove_feature_in
 
-    def execute(self, eopatch, n_reference=1):
+    def execute(self, eopatch: EOPatch, n_reference: int = 1) -> EOPatch:
         """
         Executes the split.
         :param eopatch: Input EOPatch
