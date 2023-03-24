@@ -1,6 +1,6 @@
-# Forest-Map: Large-scale forest type mapping 
+# Forest-Map: Large-scale forest type mapping
 
-This repository showcases how machine learning and multi-temporal Sentinel-2 satellite imagery can be used to perform a large-scale forest mapping. 
+This repository showcases how machine learning and multi-temporal Sentinel-2 satellite imagery can be used to perform a large-scale forest mapping.
 
 ## Background
 

@@ -1,6 +1,6 @@
 # HIECTOR: HIErarchical object deteCTOR <img src="figs/hiector-logo.png" alt="hiector" width="300" align="right"/>
 
-Repository to showcase the hierarchical building detection code available at [sentinel-hub/hiector](https://github.com/sentinel-hub/hiector). 
+Repository to showcase the hierarchical building detection code available at [sentinel-hub/hiector](https://github.com/sentinel-hub/hiector).
 
 The code in the `HiectorInference.ipynb` notebook allows to execute building detection at large scale using multi-scale satellite imagery. In this example, Sentinel-2, Airbus SPOT and Airbus Pleiades imagery will be used to detect buildings in Dakar, Senegal.
 
@@ -8,11 +8,11 @@ Pre-trained models and labels are open-source and available on the AWS S3 bucket
 
 ## Overview
 
-<img src="figs/hiector.png" alt="hiector" width="300" align="right"/> The aim of this tool is to apply object detection on satellite imagery of varying spatial resolutions in a hierarchical fashion. The prototype developed uses Sentinel-2, Airbus SPOT and Airbus Pleiades as data sources for a hierarchical detection at three spatial scales. The core idea is to execute the detection of built-up areas using Sentinel-2 imagery first, to define polygons where SPOT imagery would be requested. At the second level of the pyramid, the detection is executed on SPOT imagery to determine large-to-medium sized buildings, and areas of low confidence where small and dense buildings are located. On those areas, Pleiades imagery would be requested and object detection performed to delineate the smallest buildings. 
+<img src="figs/hiector.png" alt="hiector" width="300" align="right"/> The aim of this tool is to apply object detection on satellite imagery of varying spatial resolutions in a hierarchical fashion. The prototype developed uses Sentinel-2, Airbus SPOT and Airbus Pleiades as data sources for a hierarchical detection at three spatial scales. The core idea is to execute the detection of built-up areas using Sentinel-2 imagery first, to define polygons where SPOT imagery would be requested. At the second level of the pyramid, the detection is executed on SPOT imagery to determine large-to-medium sized buildings, and areas of low confidence where small and dense buildings are located. On those areas, Pleiades imagery would be requested and object detection performed to delineate the smallest buildings.
 
 The hierarchical approach is based on the assumption that the majority of man-made objects of interest, e.g. buildings, bridges, airplanes, are very sparse in nature and applying object detection on Very High Resolution at large-scale is inefficient and very costly.
 
-To facilitate the generalization and application of the task at different scales we formulate the task as the detection of oriented objects, with the direct estimation of oriented bounding boxes. We use the [_Single-Stage Rotation-Decoupled Detector for Oriented Object_](https://github.com/Capino512/pytorch-rotation-decoupled-detector) architecture and a pre-trained ResNet34 backbone to train a model on Sentinel-2 imagery and a joint model on Pleiades/SPOT imagery. 
+To facilitate the generalization and application of the task at different scales we formulate the task as the detection of oriented objects, with the direct estimation of oriented bounding boxes. We use the [_Single-Stage Rotation-Decoupled Detector for Oriented Object_](https://github.com/Capino512/pytorch-rotation-decoupled-detector) architecture and a pre-trained ResNet34 backbone to train a model on Sentinel-2 imagery and a joint model on Pleiades/SPOT imagery.
 
 The models were trained and evaluated on a national scale in a middle-eastern country. Quantitative evaluation of HIECTOR on a large scale allowed to characterise the cost-saving benefits of the approach with respect to the detection accuracy. These models were fine-tuned on a small set of manually created labels in Dakar, Senegal and openly distributed [here](http://queryplanet.sentinel-hub.com/index.html). Along with the fine-tuned models, you can also download the manually created building footprints.
 
@@ -27,7 +27,7 @@ The table below shows results obtained with the fine-tuned models on a small set
 
 ## Requirements
 
-Before running the notebook make sure to check out the instructions in the [sentinel-hub/hiector](https://github.com/sentinel-hub/hiector) repo and its [requirements](https://github.com/sentinel-hub/hiector/requirements.txt). 
+Before running the notebook make sure to check out the instructions in the [sentinel-hub/hiector](https://github.com/sentinel-hub/hiector) repo and its [requirements](https://github.com/sentinel-hub/hiector/requirements.txt).
 
 After installing the requirements with `pip install -r requirements.txt`, code for the Non-Max Suppression algorithm needs to be compiled for either CPU or GPU.
 

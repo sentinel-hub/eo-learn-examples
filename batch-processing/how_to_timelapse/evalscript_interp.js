@@ -166,7 +166,7 @@ function setup() {
 
 // Evaluate pixels in the bands
 function evaluatePixel(samples, scenes) {
-    
+
     // Initialise arrays
     var valid_indices = []
     var valid_dates = []
@@ -177,7 +177,7 @@ function evaluatePixel(samples, scenes) {
             valid_dates.push(withoutTime(new Date(scenes[i].date)));
         }
     }
-    
+
     var clp_thr = 0.0;
     while (valid_indices.length < 2 || valid_dates[0] > sampled_dates[0] || valid_dates[valid_dates.length-1] < sampled_dates[sampled_dates.length-1]) {
         var valid_dates = [];
@@ -191,11 +191,11 @@ function evaluatePixel(samples, scenes) {
         clp_thr += 0.05;
         if (clp_thr > 1) { break; }
     }
-    
+
     // Fill data
     var valid_samples = { 'B02': [], 'B03': [], 'B04': [], 'B08': [], 'B11': [], 'B12': [] };
     for (var i of valid_indices) { fillValues(valid_samples, samples[i]); }
-    
+
     // Calculate indices and return optimised for UINT16 format (will need unpacking)
     no_data_value = 10000;
     var [b02_interpolated, dm] = lininterp(sampled_dates, valid_dates, valid_samples['B02'], no_data_value);
@@ -204,7 +204,7 @@ function evaluatePixel(samples, scenes) {
     var [b08_interpolated, dm] = lininterp(sampled_dates, valid_dates, valid_samples['B08'], no_data_value);
     var [b11_interpolated, dm] = lininterp(sampled_dates, valid_dates, valid_samples['B11'], no_data_value);
     var [b12_interpolated, dm] = lininterp(sampled_dates, valid_dates, valid_samples['B12'], no_data_value);
-    
+
     // Return all arrays
     return {
         B02: b02_interpolated,

@@ -28,7 +28,7 @@ the bug was already reported. If not, open an issue with the **bug** label and
 report the following information:
 
 * Issue description
-* Example that is affected 
+* Example that is affected
 * How to reproduce the issue
 * Expected outcome
 * Actual outcome
@@ -44,7 +44,7 @@ If you are not sure whether the odd behaviour is a bug or a _feature_, best to o
 
 Existing feature requests can be found [here][existing-feature-requests].
 
-A new feature request can be created by opening a new issue with the **enhancement** label, and describing how the feature would benefit the **eo-learn** and **eo-learn-examples** community. 
+A new feature request can be created by opening a new issue with the **enhancement** label, and describing how the feature would benefit the **eo-learn** and **eo-learn-examples** community.
 
 [existing-feature-requests]: https://github.com/sentinel-hub/eo-learn-examples/issues?q=state:open+type:issue+label:"enhancement"
 
