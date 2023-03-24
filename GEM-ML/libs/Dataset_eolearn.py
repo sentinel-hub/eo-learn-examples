@@ -1,4 +1,6 @@
 ### 2021-05-16 ### Michael Engel ### Dataset_eolearn.py ###
+from typing import Tuple, Iterable, Optional, Callable, Union
+
 import numpy as np
 from torch.utils.data import Dataset
 from torch.autograd import Variable as V
@@ -8,22 +10,22 @@ from eolearn.core import EOPatch, FeatureType
 #%% main
 class Dataset_eolearn(Dataset):
     #%%% initialize
-    def __init__(self, paths,
-                 feature_data = (FeatureType.DATA,"data"),
-                 feature_reference = (FeatureType.MASK,"reference"),
-                 feature_mask = None,
+    def __init__(self, paths: Iterable[str],
+                 feature_data: Tuple[FeatureType, str] = (FeatureType.DATA, "data"),
+                 feature_reference: Tuple[FeatureType, str] = (FeatureType.MASK, "reference"),
+                 feature_mask: Tuple[FeatureType, str] = None,
                 
-                 transform_data = None,
-                 transform_reference = None,
-                 transform_mask = None,
+                 transform_data: Optional[Union[Callable, Iterable[Callable]]] = None,
+                 transform_reference: Optional[Union[Callable, Iterable[Callable]]] = None,
+                 transform_mask: Optional[Union[Callable, Iterable[Callable]]] = None,
                  
-                 return_idx = False,
-                 return_path = False,
+                 return_idx: bool = False,
+                 return_path: bool = False,
 
-                 torchdevice = None,
-                 torchtype_data = torch.FloatTensor,
-                 torchtype_reference = torch.LongTensor,
-                 torchtype_mask = torch.LongTensor,
+                 torchdevice: Optional[torch.device] = None,
+                 torchtype_data: Union[torch.dtype, str] = torch.FloatTensor,
+                 torchtype_reference: Union[torch.dtype, str] = torch.LongTensor,
+                 torchtype_mask: Union[torch.dtype, str] = torch.LongTensor,
                  ):
         super().__init__()
         
