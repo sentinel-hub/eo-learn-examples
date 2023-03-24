@@ -27,6 +27,22 @@ class Dataset_eolearn(Dataset):
                  torchtype_reference: Union[torch.dtype, str] = torch.LongTensor,
                  torchtype_mask: Union[torch.dtype, str] = torch.LongTensor,
                  ):
+        """
+        Dataset class enabling the use of PyTorch with data obtained through eolearn.
+        :param paths: An iterable of paths to the folders containing the EOPatch data.
+        :param feature_data: The feature name of the data feature of the EOPatch.
+        :param feature_reference: The feature name of the reference feature of the EOPatch.
+        :param feature_mask: The feature name of an optional mask feature of the EOPatch.
+        :param transform_data: Transforms applied to the data after loading.
+        :param transform_reference: Transforms applied to the reference after loading.
+        :param transform_mask: Transforms applied to the mask after loading.
+        :param return_idx: Whether to return sample index together with sample data.
+        :param return_path: Whether to return sample path together with sample data.
+        :param torchdevice: A torch device to send the data to.
+        :param torchtype_data: Torch data type to cast the data feature to after transforms.
+        :param torchtype_reference: Torch data type to cast the reference feature to after transforms.
+        :param torchtype_mask: Torch data type to cast the mask feature to after transforms.
+        """
         super().__init__()
         
         #%%%% paths
