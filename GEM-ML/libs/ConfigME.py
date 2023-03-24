@@ -25,24 +25,23 @@ import re
 import inspect
 import numpy as np
 
+from typing import Optional, Union, List, Iterable, Callable, Type
+
+
 class Config():
     #%% initialization
-    def __init__(self,name,savename=None,savename_config=None,envname=None):
-        '''
-        Parameters
-        ----------
-        name : string
-            Desired name of the project the config shall be used for XOR the desired config-file if config.load() without any argument is called directly afterwards.
-        savename : string, optional
-            Desired savename as a basis for all things to be saved in your project. The default is None.
-        savename_config : TYPE, optional
-            Desired name for the config-file which can be forwarded and loaded afterwards to ease replicability of your project. The default is None.
-
-        Returns
-        -------
-        None.
-
-        '''
+    def __init__(self,
+                 name: str,
+                 savename: Optional[str] = None,
+                 savename_config: Optional[str] = None,
+                 envname: Optional[str] = None):
+        """
+        Configuration Class to ease programming any type of scientific code.
+        :param name: Desired name of the project the config shall be used for XOR the desired config-file if config.load() without any argument is called directly afterwards.
+        :param savename: Desired savename as a basis for all things to be saved in your project. The default is None.
+        :param savename_config: Desired name for the config-file which can be forwarded and loaded afterwards to ease replicability of your project. The default is None.
+        :param envname: Desired name of the environment. The default is None.
+        """
         
         self.name = name
         self.timestamp = dt.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
@@ -64,7 +63,7 @@ class Config():
         pass
     
     #%% let it run
-    def run(self,script=None,savename_config=None):
+    def run(self, script: Optional[str] = None, savename_config: Optional[str] = None):
         if script==None:
             if hasattr(self,'main'):
                 script = self.main
@@ -93,7 +92,7 @@ class Config():
     def get_dirs(self):
         return self._get_dict('dir')
     
-    def linuxify(self,bequiet=True):
+    def linuxify(self, bequiet: bool = True):
         dictl = self.get_dirs()
         dictl.update(self.get_modules())
         dictl.update(self.get_files())
@@ -139,7 +138,7 @@ class Config():
         print(self._dict2str(self.get_modules()))
      
     #%% importME
-    def importME(self,modules=None,bequiet=True,setsyspath=False): # supports absolute imports
+    def importME(self, modules: Optional[Union[str, List[str]]] = None, bequiet: bool = True, setsyspath: bool = False): # supports absolute imports
         #%%% case if no modules given - import all modules listed in class
         if modules==None: # Please, don't do this!
             if not bequiet:
@@ -155,7 +154,7 @@ class Config():
         return importME(modules,bequiet=bequiet,setsyspath=setsyspath)
 
     #%% loading, saving...
-    def load(self,file=None,linuxify=True):
+    def load(self, file: Optional[str] = None, linuxify: bool = True):
         if file==None:
             file = self.name
 
@@ -173,7 +172,7 @@ class Config():
         pass
     
     @classmethod
-    def LOAD(cls,file,linuxify=True):
+    def LOAD(cls, file: str, linuxify: bool = True):
         name,ext = os.path.splitext(file)
         if ext==".py":
             config_ = importME(name+".config")
@@ -186,7 +185,7 @@ class Config():
             
         return config_
     
-    def save(self, savename=None):
+    def save(self, savename: Optional[str] = None):
         if savename==None:
             file = self.savename_config
         else:
@@ -196,12 +195,12 @@ class Config():
             pickle.dump(self,outfile,pickle.HIGHEST_PROTOCOL)
         return file
     
-    def saveGIT(self, savename=None):
+    def saveGIT(self, savename: Optional[str] = None):
         ### TODO
         pass
     
     #%% parsing files for config['xxx'] entries and write them into a file or the file from which this method was called
-    def parse(self,files=None,mode=1,doublewrite=False):
+    def parse(self, files: Optional[Union[str, List[str]]] = None, mode: Optional[Union[int, str]] = 1, doublewrite: bool = False):
         if type(files)==list:
             pass
         elif files==None:
@@ -259,7 +258,7 @@ class Config():
                 file_.close()
         return True
     
-    def parse_args(self,files=None,mode=1): ### TODO: expand towards args; currently kwargs only
+    def parse_args(self, files: Optional[Union[str, List[str]]] = None, mode: Optional[Union[int, str]] = 1): ### TODO: expand towards args; currently kwargs only
         '''
         Note that this method has to be called AFTER the modules in the config have already been assigned!
         '''
@@ -370,7 +369,7 @@ class Config():
             
             return True
     
-    def parse_modules(self,files=None,mode=1): ### TODO
+    def parse_modules(self, files: Optional[Union[str, List[str]]]=None, mode: Optional[Union[int, str]] = 1): ### TODO
         if type(files)==list:
             pass
         elif files==None:
@@ -433,7 +432,7 @@ class Config():
         return True
     
     #%% environment stuff
-    def env_getEnv(self,mode=None): ### TODO: include pip packages!!!
+    def env_getEnv(self, mode: Optional[str] = None): ### TODO: include pip packages!!!
         if hasattr(self,'environment') and mode==None:
             return self.environment
         
@@ -444,7 +443,7 @@ class Config():
             raise RuntimeWarning('Config.env_getEnv: mode not implemented!')
             return False
     
-    def env_saveEnv(self,savename=None,mode=None):
+    def env_saveEnv(self, savename: Optional[str] = None, mode: Optional[str] = None):
         if savename==None:
             savename = self['envname']
         
@@ -464,7 +463,7 @@ class Config():
             raise RuntimeWarning('Config.env_saveEnv: mode not implemented!')
             return False
     
-    def env_getEnvs(self,mode=None,paths=False): # get list of existing envs on machine
+    def env_getEnvs(self, mode: Optional[str] = None, paths: bool = False): # get list of existing envs on machine
         if mode==None or mode=='conda' or mode=='ForceME' or mode=='eat this!':
             envlist = json.loads(subprocess.check_output("conda env list --json",shell=True))["envs"]
             if paths:
@@ -476,7 +475,7 @@ class Config():
             raise RuntimeWarning('Config.env_getEnvs: mode not implemented!')
             return False
         
-    def env_getChannels(self,mode=None):
+    def env_getChannels(self, mode: Optional[str] = None):
         if hasattr(self,'channels') and mode==None:
             return self.channels
         
@@ -487,7 +486,7 @@ class Config():
             raise RuntimeWarning('Config.env_getChannels: mode not implemented!')
             return False
             
-    def env_setChannel(self,channel,mode=None,overwrite=False):
+    def env_setChannel(self, channel: Union[str, List[str]],mode: Optional[str] = None, overwrite: bool = False):
         if type(channel)==list:
             success = []
             for channel_ in channel[::-1]: # if overwrite=True, the order is maintained if channels are overwritten
@@ -505,7 +504,7 @@ class Config():
                 raise RuntimeWarning('Config.env_setChannel: mode not implemented!')
                 return False
     
-    def env_installEnv(self,name=None,mode=None,overwrite=False): ### TODO: include pip packages!!!
+    def env_installEnv(self, name: Optional[str] = None, mode: Optional[str] = None, overwrite: bool = False): ### TODO: include pip packages!!!
         if name==None:
             name = self['envname']
         environment = self.env_getEnv(mode=mode)
@@ -566,13 +565,13 @@ class Config():
             raise RuntimeWarning('Config.env_installEnv: mode not implemented!')
             return False
         
-    def env_adaptEnv(self,name=None,mode=None,overwrite=False):
+    def env_adaptEnv(self, name: Optional[str] = None, mode: Optional[str] = None, overwrite: bool = False):
         pass ### TODO: adapt/extend existing env
     
-    def env_extendEnv(self,envlist,mode=None):
+    def env_extendEnv(self, envlist: List[str], mode: Optional[str] = None):
         pass ### TODO: extend own environment. maybe shouldn't do this...
     
-    def env_deleteEnv(self,name=None,mode=None):
+    def env_deleteEnv(self, name: Optional[str] = None, mode: Optional[str] = None):
         if name==None:
             name = self['savename']
         
@@ -588,7 +587,7 @@ class Config():
             raise RuntimeWarning('Config.env_delete: mode not implemented!')
             return False
     
-    def env_listenvs(self,mode=None):
+    def env_listenvs(self, mode: Optional[str] = None):
         if mode==None or mode=='conda' or mode=='ForceME' or mode=='eat this!':
             print(subprocess.check_output("conda env list",shell=True).decode())
             return True
@@ -596,7 +595,7 @@ class Config():
             raise RuntimeWarning('Config.env_listenvs: mode not implemented!')
             return False
     
-    def env_list(self,mode=None):
+    def env_list(self, mode: Optional[str] = None):
         if mode==None or mode=='conda' or mode=='ForceME' or mode=='eat this!':
             print(subprocess.check_output("conda list",shell=True).decode())
             return True
@@ -622,7 +621,7 @@ class Config():
         else:
             raise RuntimeError('One positional argument XOR multiple keywordarguments!')
     
-    def extend(self,file): # same as self.update but WITHOUT overwriting name, savename, timestamp and savename_config, could be used to overwrite hardware-specific settings using a predefined config_hardware-file e.g. ### TODO: find a better name!
+    def extend(self, file: str): # same as self.update but WITHOUT overwriting name, savename, timestamp and savename_config, could be used to overwrite hardware-specific settings using a predefined config_hardware-file e.g. ### TODO: find a better name!
         with open(file, 'rb') as file_:
             model_ = pickle.load(file_)
         configdict = model_.__dict__
@@ -633,7 +632,7 @@ class Config():
                 self.__setattr__(keys[i],values[i])
         pass
     
-    def join(self,files,priority='old'):
+    def join(self, files: Union[str, List[str]], priority: str = 'old'):
         if type(files)==list:
             pass
         elif type(files)==str:
@@ -663,14 +662,14 @@ class Config():
         pass
     
     #%% utils ### TODO: Keep or remove?
-    def getME_uniquename(self,ending=''):
+    def getME_uniquename(self, ending: str = ''):
         uniquename = str(uuid.uuid4())+ending
         return uniquename
         
-    def makeME_uniquelist(self,listl):
+    def makeME_uniquelist(self, listl: Iterable):
         return list(dict.fromkeys(listl))
     
-    def countME_uniquelist(self,listl):
+    def countME_uniquelist(self, listl: Iterable):
         return len(dict.fromkeys(listl))
     
     #%% python builtins
@@ -750,14 +749,14 @@ def parse_args():
     args = parser.parse_args()
     return args
 
-def works_for_all(func):
+def works_for_all(func: Callable):
     def inner(*args, **kwargs):
         print("I can decorate any function")
         return func(*args, **kwargs)
     return inner
 
 #%% auxiliary
-def importME(modules,bequiet=True,setsyspath=False): # supports absolute imports
+def importME(modules: Union[str, List[str]], bequiet: bool = True, setsyspath: bool = False): # supports absolute imports
     if type(modules)==list:
         out = []
         for module in modules:
@@ -830,7 +829,7 @@ def importME(modules,bequiet=True,setsyspath=False): # supports absolute imports
             
     return out
 
-def getME_args(fun,key='args',ignoreself=True):
+def getME_args(fun: Union[Callable, Type], key: str = 'args', ignoreself: bool = True):
     # inspect function
     if inspect.isclass(fun):
         args,varargs,varkw,defaults,kwonlyargs,kwonlydefaults,annotations = inspect.getfullargspec(fun.__init__)
@@ -862,7 +861,7 @@ def getME_args(fun,key='args',ignoreself=True):
     else:
         return dict_args.get(key,False)
 
-def deleteME(file, bequiet=False):
+def deleteME(file: Union[str, List[str]], bequiet: bool = False):
     if type(file)==list:
         success = []
         for i in range(len(file)):
@@ -878,7 +877,7 @@ def deleteME(file, bequiet=False):
                 print("deleteME: removing did not work! Either it is not existing or you don't have permission for that, e.g. if it is still open in another application!")
             return False
 
-def runME(cmd,shell=False):
+def runME(cmd: str, shell: bool = False):
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=shell)
     while True:
         output = process.stdout.readline().decode()
@@ -890,7 +889,7 @@ def runME(cmd,shell=False):
     return rc
 
 
-def get_most_recent_config(config_dir, pattern="config_.*[.]dill", mode="m"):
+def get_most_recent_config(config_dir: str, pattern: str = "config_.*[.]dill", mode: str = "m"):
     method = os.path.getmtime if mode == "m" else os.path.getctime
 
     all_files = os.listdir(config_dir)
