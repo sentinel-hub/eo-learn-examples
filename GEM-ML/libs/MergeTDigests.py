@@ -1,6 +1,8 @@
 ### Michael Engel ### 2022-10-10 ### MergeTDigests.py ###
+import numpy as np
 import os
 import dill as pickle
+import tdigest
 import uuid
 from .ReduceME import reduce_BinaryTree
 
@@ -59,7 +61,7 @@ def mergeTDigests(
         feature: Tuple[FeatureType, str],
         threads: int = 0,
         checkthreads: bool = True,
-        bequiet: bool = False):
+        bequiet: bool = False) -> np.ndarray[tdigest.TDigest]:
     Merger = _Merger(feature=feature, mode="dill", assumetmpfiles=True)
     tdigestarray_merged_pickle = reduce_BinaryTree(
         samples = paths,
