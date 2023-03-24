@@ -21,6 +21,18 @@ class QuantileScaler_eolearn:
                  valmax: Union[float, int] = 1,
                  transform: Optional[Union[bool, Callable]] = True,
                  savename: Optional[str] = None):
+        """
+        Base class to enable quantile scaling in eolearn.
+        Scales k different channels to one uniform output range [valmin, valmax].
+        :param minval: Array of k minimum values per channel.
+        :param maxval: Array of k maximum values per channel.
+        :param nanval: Array of k values to replace resulting nan values after scaling.
+        :param infval: Array of k values to replace resulting inf values after scaling.
+        :param valmin: Minimum value of output range.
+        :param valmax: Maximum value of output range.
+        :param transform: Additional transform to apply after scaling.
+        :param savename: Filename where to save the quantile scaler.
+        """
         self.minval = np.array(minval,ndmin=1)
         self.maxval = np.array(maxval,ndmin=1)
 
