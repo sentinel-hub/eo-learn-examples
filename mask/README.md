@@ -18,6 +18,6 @@ $ pip install -r requirements.txt
 and run:
 
 ```
-$ jupyter notebook CloudMaskTask.ipynb 
+$ jupyter notebook CloudMaskTask.ipynb
 ```
 .

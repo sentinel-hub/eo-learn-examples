@@ -78,7 +78,7 @@ from sagemaker.tensorflow import TensorFlow
 custom_estimator = TensorFlow(entry_point='custom_script.py',
                                role=role,
                                framework_version='1.12.0',
-                               training_steps= 100,                                  
+                               training_steps= 100,
                                evaluation_steps= 100,
                                hyperparameters=hyperparameters,
                                train_instance_count=1,
