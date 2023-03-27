@@ -10,7 +10,6 @@ from os import path as op
 import keras
 import keras.backend as K
 import tensorflow as tf
-from focal_losses import categorical_focal_loss
 from hyperopt import hp
 from sklearn.metrics import classification_report, precision_recall_fscore_support  # f1_score, fbeta_score,
 

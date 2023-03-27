@@ -1,13 +1,11 @@
-import os
 import pprint
 import ssl
 from datetime import datetime as dt
-from functools import partial
 from os import path as op
 
 import numpy as np
 import yaml
-from hyperopt import STATUS_OK, Trials, fmin, tpe
+from hyperopt import STATUS_OK
 from keras import backend as K
 from keras.applications.vgg16 import VGG16
 from keras.applications.vgg16 import preprocess_input as vgg_preproc

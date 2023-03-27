@@ -16,10 +16,9 @@ import pandas as pd
 from shapely.geometry import Polygon
 from skimage.morphology import binary_dilation, binary_erosion, disk
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
 
 # Imports
-from eolearn.core import EOPatch, EOTask, FeatureType
+from eolearn.core import EOTask, FeatureType
 from eolearn.geometry import PointSamplingTask
 from sentinelhub import CRS, GeopediaFeatureIterator, GeopediaSession
 
