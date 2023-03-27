@@ -296,7 +296,6 @@ def train_test_split_eopatch(patch_array, features_dict, labels_dict):
     return X_train, X_test, y_train, y_test, timeframes_count, features_count
 
 
-# Function to mask out labels that are not in both train and test data and also mask out samples where features include NaN values
 def masking(X_train, X_test, y_train, y_test):
     """
     mask out labels that are not in both train and test data and also mask out samples where features include NaN values
@@ -418,7 +417,7 @@ class PredictPatch(EOTask):
             plabels = plabels[..., np.newaxis]
             eopatch.add_feature(FeatureType.MASK_TIMELESS, self.predicted_labels_name, plabels)
 
-        except:  # TempCNN model prediction
+        except Exception:  # TempCNN model prediction
             ftrs_tcnn = np.reshape(
                 scaled_ftrs, (-1, eopatch.data["FEATURES"].shape[0], eopatch.data["FEATURES"].shape[3])
             )

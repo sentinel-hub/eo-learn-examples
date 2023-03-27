@@ -9,6 +9,7 @@ from os import path as op
 
 import keras
 import keras.backend as K
+import numpy as np
 import tensorflow as tf
 from hyperopt import hp
 from sklearn.metrics import classification_report, precision_recall_fscore_support  # f1_score, fbeta_score,
@@ -42,13 +43,15 @@ class ClasswisePerformance(keras.callbacks.Callback):
         self.f1s = []
         self.gen_steps = gen_steps
 
-    def on_train_begin(self, logs={}):
+    def on_train_begin(self, logs=None):
+        logs = logs if logs else {}
         self.precisions = []
         self.recalls = []
         self.f1s = []
 
-    def on_epoch_end(self, epoch, logs={}):
+    def on_epoch_end(self, epoch, logs=None):
         # TODO: Not efficient as this requires re-computing test data
+        logs = logs if logs else {}
         self.test_gen.reset()
         y_true = self.test_gen.classes
         class_labels = list(self.test_gen.class_indices.keys())

@@ -1,3 +1,4 @@
+import contextlib
 import json
 import os
 import sys
@@ -32,17 +33,14 @@ with open(fname, "r") as file:
 
 id_ints = []
 for id in ids[1:]:
-    try:
+    with contextlib.suppress(ValueError):
         id_ints.append(int(id.strip('"')))
-    except ValueError as e:
-        pass
-
 
 BATCH = 100
 hl = len(id_ints)
 cycles = ceil(hl / BATCH)
 with open(sys.argv[2], "w") as wf:
-    for i in range(0, cycles):  ## iterate through all tweets
+    for i in range(0, cycles):  # iterate through all tweets
         statuses = []  # initialize data object
         h = id_ints[0:BATCH]
         del id_ints[0:BATCH]
