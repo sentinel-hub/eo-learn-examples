@@ -6,7 +6,7 @@ The availability of open Earth observation (EO) data through the Copernicus and 
 
 **`eo-learn`** _library acts as a bridge between Earth observation/Remote sensing field and Python ecosystem for data science and machine learning._ The library is written in Python and uses NumPy arrays to store and handle remote sensing data. Its aim is to make entry easier for non-experts to the field of remote sensing on one hand and bring the state-of-the-art tools for computer vision, machine learning, and deep learning existing in Python ecosystem to remote sensing experts.
 
-The **`eo-learn-examples`** repository contains example Earth observation workflows that extract valuable information from satellite imagery, giving you hints and ideas how to use the EO data. 
+The **`eo-learn-examples`** repository contains example Earth observation workflows that extract valuable information from satellite imagery, giving you hints and ideas how to use the EO data.
 
 ## Sentinel-Hub account
 
@@ -18,7 +18,7 @@ After you have decided which configuration to use, you have two options You can 
 
 ##  Overview
 
-TODO 
+TODO
 
 ## Installation
 
@@ -43,8 +43,8 @@ We are very curious to see how you use `eo-learn`. If you would like to contribu
  * [Tracking a rapidly changing planet](https://medium.com/@developmentseed/tracking-a-rapidly-changing-planet-bc02efe3545d) (by Development Seed)
  * [Land Cover Monitoring System](https://medium.com/sentinel-hub/land-cover-monitoring-system-84406e3019ae) (by Jovan Visnjic and Matej Aleksandrov)
  * [eo-learn Webinar](https://www.youtube.com/watch?v=Rv-yK7Vbk4o) (by Anze Zupanc)
- * [Cloud Masks at Your Service](https://medium.com/sentinel-hub/cloud-masks-at-your-service-6e5b2cb2ce8a) 
- * [ML examples for Common Agriculture Policy](https://medium.com/sentinel-hub/area-monitoring-concept-effc2c262583) 
+ * [Cloud Masks at Your Service](https://medium.com/sentinel-hub/cloud-masks-at-your-service-6e5b2cb2ce8a)
+ * [ML examples for Common Agriculture Policy](https://medium.com/sentinel-hub/area-monitoring-concept-effc2c262583)
    * [High-Level Concept](https://medium.com/sentinel-hub/area-monitoring-concept-effc2c262583)
    * [Data Handling](https://medium.com/sentinel-hub/area-monitoring-data-handling-c255b215364f)
    * [Outlier detection](https://medium.com/sentinel-hub/area-monitoring-observation-outlier-detection-34f86b7cc63)
@@ -59,7 +59,7 @@ We are very curious to see how you use `eo-learn`. If you would like to contribu
    * [Combining the Markers into Decisions](https://medium.com/sentinel-hub/area-monitoring-combining-markers-into-decisions-d74f70fe7721)
    * Traffic Light System (still to come)
    * Expert Judgement Application (still to come)
- * [Scale-up your eo-learn workflow using Batch Processing API](https://medium.com/sentinel-hub/scale-up-your-eo-learn-workflow-using-batch-processing-api-d183b70ea237) (by Maxim Lamare) 
+ * [Scale-up your eo-learn workflow using Batch Processing API](https://medium.com/sentinel-hub/scale-up-your-eo-learn-workflow-using-batch-processing-api-d183b70ea237) (by Maxim Lamare)
 
 
 ## Questions and Issues

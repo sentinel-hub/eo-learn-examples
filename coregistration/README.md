@@ -2,7 +2,7 @@
 
 **Coregistration** example illustrates how to use a ```RegistrationTransform``` to temporally align the frames of an EOPatch using different algorithms:
  + Thunder registration
- + Enhanced Cross-Correlation 
+ + Enhanced Cross-Correlation
  + Point-Based Registration
 
 

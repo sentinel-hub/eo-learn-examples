@@ -26,6 +26,6 @@ The notebooks require `Keras` with `tensorflow` back-end.
 
 ## Execution on AWS SageMaker
 
-An example notebook on how to run run the workflow using [AWS SageMaker](https://aws.amazon.com/sagemaker/) is also provided. 
+An example notebook on how to run run the workflow using [AWS SageMaker](https://aws.amazon.com/sagemaker/) is also provided.
 
 Instructions on how to run the notebook on SageMaker can be found [here](sagemaker.md).
