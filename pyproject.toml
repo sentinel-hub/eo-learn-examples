@@ -10,7 +10,7 @@ line_length = 120
 
 [tool.nbqa.addopts]
 flake8 = [
-    "--extend-ignore=E402,E501",
+    "--extend-ignore=E402,E501,F841",
 ]
 
 [tool.nbqa.exclude]
