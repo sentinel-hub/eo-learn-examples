@@ -6,12 +6,8 @@ utils.py
 Utility functions for printing training details
 """
 import pprint
-import shutil
 
-import matplotlib as mpl
-import numpy as np
 import train_config_pd as tcf
-from keras.models import model_from_yaml
 
 # from pygeotile.tile import Tile
 

@@ -13,7 +13,7 @@ def rgb_int(row):
 def construct_cmap(colors, data, name="cmap"):
     sub = []
     un = np.unique(data)
-    for i, entry in enumerate(colors):
+    for entry in colors:
         if np.isin(entry.values[1], un):
             sub.append([entry.values[0], entry.values[1], entry.values[2]])
     bounds = [sub[0][1] - 0.5]
