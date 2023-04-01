@@ -1,3 +1,5 @@
+from typing import Optional
+
 import torch
 from torch import Tensor
 
@@ -6,8 +8,7 @@ class MSELossMasked(torch.nn.MSELoss):
     This class provides the mean squared error (MSE) loss function implementation in PyTorch,
     which is extended to handle masked input tensors.
     """
-    
-    def __init__(self, size_average=None, reduce=None, reduction: str = 'mean') -> None:
+    def __init__(self, size_average: bool = None, reduce: Optional[bool] = None, reduction: str = 'mean') -> None:
         super(MSELossMasked, self).__init__(size_average, reduce, reduction)
 
     def forward(self, input: Tensor, target: Tensor, mask: Tensor) -> Tensor:

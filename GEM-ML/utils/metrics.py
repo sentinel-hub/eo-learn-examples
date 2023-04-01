@@ -4,25 +4,20 @@ from torch import Tensor
 from sklearn.metrics import cohen_kappa_score
 
 
-def accuracy(out,targets,mask):
+def accuracy(out: torch.Tensor, targets: torch.Tensor, mask: torch.Tensor):
     """
-    Computes the accuracy of the model
-    
-    :param out: Output tensor, representing the predicted class scores for each sample in the batch.
-    :type out: Tensor
-    :param targets: Target tensor, representing the true class labels for each sample in the batch.
-    :type targets: Tensor
-    :param mask: Mask tensor, with the same shape as the output tensor, where each element is either 0 or 1.
-    :type mask: Tensor
-    :return: The accuracy of the model predictions.
-    :rtype: Tensor
+    Calculates the accuracy of the predicted tensor and the target tensor, without taking into account masked out pixels.
+    :param out: Predicted tensor.
+    :param targets: Target tensor.
+    :param mask: Mask tensor.
+    :return: Accuracy
     """
     pred_classes = torch.argmax(out, axis=1)
     nr_true_pred = torch.eq(pred_classes, targets.squeeze(1))
     return (nr_true_pred.float() * mask.long().squeeze(1)).sum()/(torch.count_nonzero(mask.long()))
 
 
-def cohen_kappa(out,targets,mask):
+def cohen_kappa(out: torch.Tensor, targets: torch.Tensor, mask: torch.Tensor):
     """
     Computes the Cohen's kappa coefficient for the model predictions
     
