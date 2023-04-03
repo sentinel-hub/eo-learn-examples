@@ -1,8 +1,14 @@
+from typing import Iterable
+
 import numpy as np
 import natsort
+from sentinelhub.areas import BBoxSplitter
 
 
-def split_bbox_list(bbox_splitter, percentages, mode="v", reversed=False):
+def split_bbox_list(bbox_splitter: BBoxSplitter,
+                    percentages: Iterable[float],
+                    mode: str = "v",
+                    reversed: bool = False):
     """
     Splits a list of bboxes according to the given percentages. Note that only whole rows/columns are assigned to
     splits, hence resulting percentage may vary from the target percentages.

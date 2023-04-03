@@ -1,17 +1,25 @@
 from typing import Union, Tuple, List, Sequence, Optional, Callable
 import uuid
 
-from eolearn.core import EOTask, EONode, FeatureType
+from eolearn.core import EOTask, EONode, FeatureType, EOPatch
 
 
 class ConditionalTask(EOTask):
-    def __init__(self, conditional, eotask, indicate_condition=None, remove_indicator=None, verbose=False):
+    def __init__(self,
+                 conditional: Callable,
+                 eotask: EOTask,
+                 indicate_condition: Optional[str] = None,
+                 remove_indicator: Optional[str] = None,
+                 verbose: bool = False):
         """
-        Wrapper class around an arbitrary EOTask. Performs original execute method if conditional returns True.
+        Wrapper class around an arbitrary EOTask. Performs the original execute method if conditional returns True.
         Passes the input EOPatch unchanged if conditional returns false.
         :param conditional: function taking in as argument an EOPatch; returns True or False
         :param eotask: Instance of EOTask to be wrapped
-        :param indicate_condition: 
+        :param indicate_condition: Flag indicating the result of conditional. Stored in EOPatch meta info.
+        Predominantly used in conditional chaining.
+        :param remove_indicator: Feature name of indicator to remove. Predominantly used in conditional chaining.
+        :param verbose: Whether to print result of conditional.
         """
         self.conditional = conditional
         self.task = eotask
@@ -21,7 +29,7 @@ class ConditionalTask(EOTask):
 
         self.verbose = verbose
 
-    def execute(self, eopatch, **kwargs):
+    def execute(self, eopatch: EOPatch, **kwargs) -> EOPatch:
         if self.conditional(eopatch):
             if self.verbose:
                 print(f"{self.__class__.__name__} ({self.task.__class__.__name__}) :"

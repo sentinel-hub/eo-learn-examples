@@ -1,4 +1,6 @@
 ### 2021-05-16 ### Michael Engel ### Dataset_eolearn.py ###
+from typing import Tuple, Iterable, Optional, Callable, Union
+
 import numpy as np
 from torch.utils.data import Dataset
 from torch.autograd import Variable as V
@@ -8,23 +10,39 @@ from eolearn.core import EOPatch, FeatureType
 #%% main
 class Dataset_eolearn(Dataset):
     #%%% initialize
-    def __init__(self, paths,
-                 feature_data = (FeatureType.DATA,"data"),
-                 feature_reference = (FeatureType.MASK,"reference"),
-                 feature_mask = None,
+    def __init__(self, paths: Iterable[str],
+                 feature_data: Tuple[FeatureType, str] = (FeatureType.DATA, "data"),
+                 feature_reference: Tuple[FeatureType, str] = (FeatureType.MASK, "reference"),
+                 feature_mask: Tuple[FeatureType, str] = None,
                 
-                 transform_data = None,
-                 transform_reference = None,
-                 transform_mask = None,
+                 transform_data: Optional[Union[Callable, Iterable[Callable]]] = None,
+                 transform_reference: Optional[Union[Callable, Iterable[Callable]]] = None,
+                 transform_mask: Optional[Union[Callable, Iterable[Callable]]] = None,
                  
-                 return_idx = False,
-                 return_path = False,
+                 return_idx: bool = False,
+                 return_path: bool = False,
 
-                 torchdevice = None,
-                 torchtype_data = torch.FloatTensor,
-                 torchtype_reference = torch.LongTensor,
-                 torchtype_mask = torch.LongTensor,
+                 torchdevice: Optional[torch.device] = None,
+                 torchtype_data: Union[torch.dtype, str] = torch.FloatTensor,
+                 torchtype_reference: Union[torch.dtype, str] = torch.LongTensor,
+                 torchtype_mask: Union[torch.dtype, str] = torch.LongTensor,
                  ):
+        """
+        Dataset class enabling the use of PyTorch with data obtained through eolearn.
+        :param paths: An iterable of paths to the folders containing the EOPatch data.
+        :param feature_data: The feature name of the data feature of the EOPatch.
+        :param feature_reference: The feature name of the reference feature of the EOPatch.
+        :param feature_mask: The feature name of an optional mask feature of the EOPatch.
+        :param transform_data: Transforms applied to the data after loading.
+        :param transform_reference: Transforms applied to the reference after loading.
+        :param transform_mask: Transforms applied to the mask after loading.
+        :param return_idx: Whether to return sample index together with sample data.
+        :param return_path: Whether to return sample path together with sample data.
+        :param torchdevice: A torch device to send the data to.
+        :param torchtype_data: Torch data type to cast the data feature to after transforms.
+        :param torchtype_reference: Torch data type to cast the reference feature to after transforms.
+        :param torchtype_mask: Torch data type to cast the mask feature to after transforms.
+        """
         super().__init__()
         
         #%%%% paths

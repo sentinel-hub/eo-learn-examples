@@ -4,14 +4,35 @@ from queue import Empty
 import sys
 from contextlib import nullcontext
 
+from typing import Optional, Callable, Union, List
+
+
 #%% process functions
 #%%% Binary Tree
-def _reducefun_BinaryTree(queue,ID,
-                        threadcounter,
-                        counter,threshold,
-                        locky,
-                        reducer=None, ordered=False,
-                        timeout=1,bequiet=False):
+def _reducefun_BinaryTree(queue: mp.Queue,
+                          ID: int,
+                          threadcounter: mp.Value,
+                          counter: mp.Value,
+                          threshold: int,
+                          locky: mp.Lock,
+                          reducer: Optional[Callable] = None,
+                          ordered: bool = False,
+                          timeout: int = 1,
+                          bequiet: bool = False):
+    """
+    Helper function carrying out the reduction operation.
+    :param queue: Queue of samples to reduce.
+    :param ID: Thread ID.
+    :param threadcounter: Number of threads.
+    :param counter: Amount of already processed samples.
+    :param threshold: Number of samples to be processed in total.
+    :param locky: A lock object to block thread access.
+    :param reducer: An optional callable performing the reducing operation of two items.
+    :param ordered: Whether to preserve order of samples while reducing.
+    :param timeout: Seconds to wait for new item before raising an exception.
+    :param bequiet: Whether to print progress.
+    :return: Returns 0 after successful execution.
+    """
     while True: 
         with locky:
             if not threadcounter.value<=(threshold+1-counter.value)//2: # condition absolutely crucial at this particular place!!! Maybe switch to end of while loop?
@@ -47,10 +68,27 @@ def _reducefun_MaryTree(): # choose number of children
 
 #%% main methods
 #%%% Binary Tree
-def reduce_BinaryTree(samples, reducer=None, ordered=False,
-                     queue=None, timeout=1,
-                     threads=0, checkthreads=True,
-                     bequiet=False):
+def reduce_BinaryTree(samples: Union[List[str], int],
+                      reducer: Optional[Callable] = None,
+                      ordered: bool = False,
+                      queue: Optional[mp.Queue] = None,
+                      timeout: int = 1,
+                      threads: int = 0,
+                      checkthreads: bool = True,
+                      bequiet: bool = False):
+    """
+    Utility to process a series of reducing operations using a binary tree approach using multiprocessing.
+    :param samples: The items to perform the reducing operations on. Optionally, when providing a queue,
+    the number of samples to process.
+    :param reducer: An optional callable performing the reducing operation of two items.
+    :param ordered: Whether to preserve order of samples while reducing.
+    :param queue: An optional instance of a queue. If provided, samples are ignored.
+    :param timeout: Seconds to wait for new item before raising an exception.
+    :param threads: Number of threads to use.
+    :param checkthreads: Whether to check the feasibility of the threads argument.
+    :param bequiet: Whether to print progress.
+    :return: The final reduction result if reducing was successful, the remaining queue otherwise.
+    """
     #%%%% check input arguments
     if type(samples)==list:
         Nsamples = len(samples)
