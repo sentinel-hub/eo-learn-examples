@@ -1,8 +1,0 @@
-*__pycache__*
-.ipynb_checkpoints/
-data/
-execution_reports
-results/
-.DS_Store
-.vscode
-*.dill
