@@ -79,7 +79,7 @@ def mergeTDigests(
         feature: Tuple[FeatureType, str],
         threads: int = 0,
         checkthreads: bool = True,
-        bequiet: bool = False) -> np.ndarray[tdigest.TDigest]:
+        bequiet: bool = False) -> Iterable[tdigest.TDigest]:
     """
     Method to merge multiple TDigest objects.
     :param paths: An iterable containing the paths to TDigest items (see above for possible target types).
