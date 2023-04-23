@@ -1,6 +1,17 @@
 import torch.nn as nn
 import torch
 
+"""
+An implementation of a Convolutional LSTM in Pytorch.
+https://github.com/ndrplz/ConvLSTM_pytorch/blob/master/convlstm.py
+
+Authors:
+Andrea Palazzi - https://github.com/ndrplz
+Davide Abati - https://github.com/DavideA
+
+MIT License
+"""
+
 
 class ConvLSTMCell(nn.Module):
 

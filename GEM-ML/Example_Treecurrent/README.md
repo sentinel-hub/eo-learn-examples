@@ -17,3 +17,5 @@ reference are created in order to only back-track gradients from non-cloudy and 
 pixels.
 
 ![Example reference](example_reference.png)
+
+The used model architecture ([ConvLSTM](https://github.com/ndrplz/ConvLSTM_pytorch/blob/master/convlstm.py)) is published under the MIT License.
