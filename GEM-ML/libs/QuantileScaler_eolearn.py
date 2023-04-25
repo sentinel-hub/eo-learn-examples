@@ -123,7 +123,7 @@ class QuantileScaler_eolearn:
 class QuantileScaler_eolearn_tdigest(QuantileScaler_eolearn):
     #%%% init
     def __init__(self,
-                 tdigestarray: np.ndarray[tdigest.TDigest],
+                 tdigestarray: Iterable[tdigest.TDigest],
                  minquantile: float,
                  maxquantile: float,
                  nanval: Union[Union[float, int], Iterable[Union[float, int]]],

@@ -7,15 +7,12 @@
 **/runs
 */runs
 data/*
-__pycache__/
+**/__pycache__/
 
+**/execution_reports
 **/eoexecution-report*
 **/*.egg-info
-
-*.tif
-*.tiff
-*.dill
-*.tar
+**/.ipynb_checkpoints/
 
 **/*.tif
 **/*.tiff
