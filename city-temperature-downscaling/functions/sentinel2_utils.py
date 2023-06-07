@@ -6,37 +6,50 @@ import utm
 import rasterio
 from scipy.interpolate import griddata
 
-def sentinel2_proj(path_sentinel):
-    
+def sentinel2_proj(eopatch_s2_l1c, bbox_wgs84):
     print("Sentinel 2 grid projection")
-    # get path to metadata
-    # path: "'path_sentinel'/GRANULE/.../MTD_TL.xml"
-    metadata = glob.glob(path_sentinel + "/GRANULE/*")[0] + "/MTD_TL.xml"
+    # UTM information of upper-left corner
+    utm_upper_left = utm.from_latlon(bbox_wgs84[3], bbox_wgs84[0], force_zone_number=33)
 
-    # read metadata
-    # xml file
-    xml_data = open(metadata, 'r').read()  # Read data
-    xmlDict = xmltodict.parse(xml_data)
+    # coordinates of upper-left corner
+    coo_upper_left = [int(utm_upper_left[0]), int(utm_upper_left[1])]
 
     # Projection: UTM information of satellite image
     # UTM zone
-    utm_zone_proj = xmlDict['n1:Level-1C_Tile_ID']["n1:Geometric_Info"]["Tile_Geocoding"]["HORIZONTAL_CS_NAME"].split(" ")[4].split("N")[0]
+    utm_zone_proj = utm_upper_left[2]
     # UTM hemisphere (north/south)
-    utm_hemi_proj = xmlDict['n1:Level-1C_Tile_ID']["n1:Geometric_Info"]["Tile_Geocoding"]["HORIZONTAL_CS_NAME"].split(" ")[4].split(utm_zone_proj)[1]
+    utm_hemi_proj = utm_upper_left[3]
 
-    # get coordinates of upper left corner of satellite image
-    coo_upper_left = [int(xmlDict['n1:Level-1C_Tile_ID']["n1:Geometric_Info"]["Tile_Geocoding"]["Geoposition"][0]["ULX"]), int(xmlDict['n1:Level-1C_Tile_ID']["n1:Geometric_Info"]["Tile_Geocoding"]["Geoposition"][0]["ULY"])]
 
-    # dimensions (number of pixels) in x and y direction
-    # 10 m resolution bands
-    ydim = int(xmlDict['n1:Level-1C_Tile_ID']["n1:Geometric_Info"]["Tile_Geocoding"]["Size"][0]["NROWS"])
-    xdim = int(xmlDict['n1:Level-1C_Tile_ID']["n1:Geometric_Info"]["Tile_Geocoding"]["Size"][0]["NCOLS"])
+    xdim = eopatch_s2_l1c.data["L1C_data"][0].shape[1]
+    ydim = eopatch_s2_l1c.data["L1C_data"][0].shape[0]
+
 
     # create UTM grids (x- and y-coordinates)
     x_utm = np.array([coo_upper_left[0]+i*10 for i in np.arange(0,xdim,1)])
     y_utm = np.array([coo_upper_left[1]-i*10 for i in np.arange(0,ydim,1)])
     x_grid = np.tile(x_utm,(ydim,1))
     y_grid = np.tile(np.vstack(y_utm),(1,xdim))
+
+    print("---------------------------")
+
+    return x_grid, y_grid, utm_zone_proj, utm_hemi_proj
+
+def zoom_sentinel2_wgs84_grid(x_grid_big, y_grid_big, bbox_wgs84, utm_zone_proj, utm_hemi_proj):
+    # get UTM grid around the bbox
+    ll_um = utm.from_latlon(bbox_wgs84[1]-0.2, bbox_wgs84[0]-0.2, force_zone_number=int(utm_zone_proj))
+    ur_um = utm.from_latlon(bbox_wgs84[3]+0.2, bbox_wgs84[2]+0.2, force_zone_number=int(utm_zone_proj))
+
+    utm_hemi_proj = ll_um[3]
+
+    idx_col = np.where((x_grid_big[0,:] >= ll_um[0]) & (x_grid_big[0,:] <= ur_um[0]))[0]
+    idx_row = np.where((y_grid_big[:,0] >= ll_um[1]) & (y_grid_big[:,0] <= ur_um[1]))[0]
+
+    x_grid = x_grid_big[:,idx_col]
+    x_grid = x_grid[idx_row,:]
+
+    y_grid = y_grid_big[:,idx_col]
+    y_grid = y_grid[idx_row,:]
 
     # for simplification reasons create m x n grid with m = n
     if x_grid.shape[0] != x_grid.shape[1]:
@@ -47,11 +60,13 @@ def sentinel2_proj(path_sentinel):
             x_grid = x_grid[0:x_grid.shape[1],:]
             y_grid = y_grid[0:y_grid.shape[1],:]
 
+    # convert big satellite scene from UTM to WGS84
+    print("Sentinel 2 coordinates transformation:\nUTM "+str(utm_zone_proj)+str(utm_hemi_proj)+" -> geographic coordinates (WGS84)")
+    wgs84_coordinates = utm.to_latlon(x_grid[0,:], y_grid[:,0], int(utm_zone_proj), utm_hemi_proj)
+    lat_grid = wgs84_coordinates[0]
+    lon_grid = wgs84_coordinates[1]
     print("---------------------------")
-
-    return x_grid, y_grid, utm_zone_proj, utm_hemi_proj
-
-
+    return lat_grid, lon_grid, utm_hemi_proj
 
 # get bounding box as grid in WGS84
 # projection we want at the end
@@ -90,7 +105,7 @@ def clip_satellite_scene(x_grid_big, y_grid_big, bbox_wgs84, utm_zone_proj, utm_
     return x_grid_wgs84, y_grid_wgs84
 
 
-def sentinel2_bands(jp2_path, y_grid_big, x_grid_big, utm_zone_proj, bbox_wgs84):
+def sentinel2_bands(eopatch_s2_l1c, y_grid_big, x_grid_big, utm_zone_proj, bbox_wgs84):
     print("Sentinel 2 bands extraction")
     print("Sentinel 2 bands clipping to smaller size")
 
@@ -100,29 +115,15 @@ def sentinel2_bands(jp2_path, y_grid_big, x_grid_big, utm_zone_proj, bbox_wgs84)
     idx_col = np.where((x_grid_big[0,:] >= ll_um[0]) & (x_grid_big[0,:] <= ur_um[0]))[0]
     idx_row = np.where((y_grid_big[:,0] >= ll_um[1]) & (y_grid_big[:,0] <= ur_um[1]))[0]
 
-    bands_name = ["B02", "B03", "B04", "B08", "B11", "B12"]
+    # Exract Bands 2, 3, 4, 8, 11, and 12
+    bands_idx = [1,2,3,7,11,12]
     bands_array = []
-    for j in bands_name:
-        bdata = rasterio.open(jp2_path[np.where([(j+".jp2") in i for i in jp2_path])[0][0]]).read()[0, :, :].astype(float)
+    for j in bands_idx:
+        bdata = (eopatch_s2_l1c.data["L1C_data"][0][:,:,j])
 
-        # check that bdata is a m x n grid with, fulfilling the condition m = n
-        if (bdata.shape[0] != bdata.shape[1]):
-            if bdata.shape[0] < bdata.shape[1]:
-                bdata = bdata[:, 0:bdata.shape[0]]
-            else:
-                bdata = bdata[0:bdata.shape[1], :]
-
-        if bdata.shape == (y_grid_big.shape[0], x_grid_big.shape[1]):
-            bdata_clip = bdata[:, idx_col]
-            bdata_clip = bdata_clip[idx_row, :]
-            bands_array.append(bdata_clip)
-        else:
-            # disaggregate 20 m bands to 10 m resolution
-            bdata = np.repeat(bdata, 2, axis=1)
-            bdata = np.repeat(bdata, 2, axis=0)
-            bdata_clip = bdata[:, idx_col]
-            bdata_clip = bdata_clip[idx_row, :]
-            bands_array.append(bdata_clip)
+        bdata_clip = bdata[:, idx_col]
+        bdata_clip = bdata_clip[idx_row, :]
+        bands_array.append(bdata_clip)
 
     print("---------------------------")
     return bands_array
