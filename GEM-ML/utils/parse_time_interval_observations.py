@@ -79,7 +79,8 @@ def parse_time_interval_observations(time_interval,
         maxcc = maxcc, 
         config = config
     )
-    
+    timestamps = [ts.replace(tzinfo=pytz.utc) for ts in timestamps]
+
     ### return
     if len(timestamps)<abs(n_obs) or include_borders==False and len(timestamps)==abs(n_obs) and (checkstart==timestamps[0] or checkend==timestamps[-1]):
         print('parse_time_interval_observations: not enough observations found - returning checkinterval!')

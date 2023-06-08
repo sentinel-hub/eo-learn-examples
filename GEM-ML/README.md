@@ -9,18 +9,42 @@ We explicitly emphasize the word “relevant” in the sense that GEM tries to s
 In contrast to toy examples, that asks for an appropriate infrastructure.
 That infrastructure is presented in the following.
 
+---
 ## Examples
 - Deforestation Detection based on Sentinel-2 (Example_DeforestationDetection)
 - NDVI Prediction based on Sentinel-2 (Example_Treecurrent)
 - Water Segmentation based on Sentinel-1 (Example_WaterSegmentation)
 
+---
 ## Installation
-In general, we tested everything using pip and not conda.
-We provide a requirements.txt file but we highly recomment installing eo-learn and PyTorch separately according to their documentations.
-For example, eo-learn on Windows machines asks for specific WHLs do be downloaded.
-PyTorch, however, asks for hardware specific versions of CUDA.
-Further, you have to install the whole directory by using "pip install -e 'path to directory'".
 
+In general, we tested the installation using **Python 3.8** and **pip**.
+
+
+#### Create new virtual environment and activate
+- `python -m venv MYENV`
+- activate venv 
+  - Windows: `MYENV/Scripts/activate.bat`
+  - Linux: `source MYENV/bin/activate`
+
+#### Install packages
+All necessary packages are listed in the requirements file. It can be installed via
+`pip install -r requirements.txt`. 
+
+For the `eo-learn` packages, the installation through the requirements file
+might fail. In that case, remove the packages `eo-learn-*` from the requirement file and
+install them manually, following the [official installation instructions](https://eo-learn.readthedocs.io/en/latest/install.html).
+
+
+#### Install `GEM-ML` as a package `pip install -e /PATH/TO/GEM-ML`
+
+#### Install PyTorch separately
+- follow [official installation instructions](https://pytorch.org/get-started/locally/) for your system specifications
+- example for CPU only version: `pip install torch torchvision torchaudio`
+
+
+
+---
 ## Authors
 - Michael Engel (m.engel@tum.de)
 - Colin Moldenhauer (colin.moldenhauer@tum.de)

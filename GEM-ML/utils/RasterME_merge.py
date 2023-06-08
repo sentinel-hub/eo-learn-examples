@@ -445,11 +445,11 @@ def raster_merge(
         if len(inputfiles)<2:
             print('raster_merge: one file cannot be merged... Continues anyway...')
         tmpfile = getME_uniquename(ending='.txt')
-        np.savetxt(tmpfile,np.array(inputfiles),fmt='%s')
+        np.savetxt(tmpfile,np.array(inputfiles),fmt='"%s"')
         inputfiles_string = ' --optfile %s'%tmpfile
 
         #%%%%%% outputfile_string: output
-        outputfile_string = ' %s'%outputfile
+        outputfile_string = ' "%s"'%outputfile
         
         #%%%%% coords_string: choose coordinates of merged file
         if coords==None:

@@ -7,4 +7,4 @@ In the end, we showcase the performance of our trained model for the hypothetic 
 - split into 5120m times 5120m patches, which means 256x256 pixels at a resolution of 20m
 - bands B02, B03, B04, B08, B11 and B12 of Sentinel-2
 - maximum cloud coverage of 30% based on s2cloudless mask
-- [TMF dataset](https://forobs.jrc.ec.europa.eu/TMF/) of the 2021-12-31 as a reference (downsampled to 20m using nearest neighbor interpolation)
+- [TMF dataset](https://forobs.jrc.ec.europa.eu/TMF/) of the 2021-12-31 as a reference (downsampled to 20m using nearest neighbor interpolation), more specifically the [N0, W60 tile](https://ies-ows.jrc.ec.europa.eu/iforce/tmf_v1/download.py?type=tile&dataset=AnnualChange_2021&lat=N0&lon=W60)
