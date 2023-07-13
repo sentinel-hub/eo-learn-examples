@@ -75,6 +75,7 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+.jupyter
 
 # pyenv
 .python-version
@@ -123,3 +124,6 @@ features/.pytest_cache
 
 # execution reports
 **execution-report**
+
+# MacOS
+.DS_Store
