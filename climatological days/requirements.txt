@@ -1,0 +1,7 @@
+cartopy==0.21.1
+dateutil==2.8.2
+geopandas==0.13.0
+matplotlib==3.5.2
+meteoblue_dataset_sdk==1.2.2
+numpy==1.21.0
+pandas==1.5.0
