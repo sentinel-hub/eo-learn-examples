@@ -2,29 +2,19 @@
 
 Responsible: Nico Bader
 
-This repository demonstrates how to extract the structure of a city's temperature field by using satellite data (Step I). A slide set shows how this gets combined with weather data to generate e.g. urban heat island maps (Step 2). That process will be made available via a meteoblue API that returns a heat map for the selected hour on a selected day and the notebook will be updated accordingly.
+This repository demonstrates how to extract the structure of a city's temperature field by using satellite data (Step I). A slide set shows how this gets combined with weather data to generate e.g. urban heat island maps (Step 2). That process will be made available via a meteoblue API that returns a heat map as image or data for the selected hour on a selected day and the notebook will be updated accordingly.
 
+# I) Getting started
 
-# I) Satellite pre-processing
+**1. Install and activate a new conda environment**
 
-## Getting started
-
-**1. Clone the repository *satellite pre-processing* to your local machine.**
+We will call this conda environment *city_temp_env* (just as an example).
 ```
-cd existing_repo
-git clone https://git.meteoblue.com/metoffice/satellite-pre-processing.git
-cd satellite-pre-processing
+conda create --name city_temp_env
+conda activate city_temp_env
 ```
 
-**2. Install and activate a new conda environment**
-
-We will call this conda environment *sat_env* (just as an example).
-```
-conda create --name sat_env
-conda activate sat_env
-```
-
-**3. Install all the required modules**
+**2. Install all the required modules**
 
 To run the satellite pre-processing, the following Python modules are needed:
 
@@ -39,6 +29,10 @@ To run the satellite pre-processing, the following Python modules are needed:
 - matplotlib
 - scipy
 - netcdf4
+- PIL
+- urllib
+- json
+- datetime
 
 Please use *conda-forge* to install the required modules.
 
@@ -46,14 +40,23 @@ Please use *conda-forge* to install the required modules.
 conda install -c conda-forge pip jupyterlab pandas zip xmltodict utm rasterio gdal matplotlib scipy netcdf4
 ```
 
-**4. Create the missing directories**
+**OR**
+
+Install all required modules with the requirements.txt
+
+```
+conda create --name city_temp_env --file requirements.txt
+```
+
+# II) Satellite pre-processing
+
+**Create the missing directories**
 
 Create a output directory where the netCDF files will be stored.
 
 ```
 mkdir output
 ```
-
 
 ## Run the example jupyter notebook
 
@@ -73,6 +76,10 @@ There are two files in the satellite data folder:
 
 !! Do not unzip them manually. Download them and save them into the *data/satellite/* folder.
 
-# 2) Access High-resolution API
+# III) Access High-resolution API
 
-Will be added soon.
+## Run the example jupyter notebook
+
+To understand how meteoblue's high-resolution API works, you can use the jupyter notebook *mb_highresolution_API.ipynb*.
+The API with its Endpoints will be explained step-by-step.
+
