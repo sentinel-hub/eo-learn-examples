@@ -82,4 +82,3 @@ There are two files in the satellite data folder:
 
 To understand how meteoblue's high-resolution API works, you can use the jupyter notebook *mb_highresolution_API.ipynb*.
 The API with its Endpoints will be explained step-by-step.
-
