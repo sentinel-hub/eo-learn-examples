@@ -15,3 +15,15 @@ flake8 = [
 
 [tool.nbqa.exclude]
 flake8 = "super-resolution-fastai/"
+
+
+[tool.ruff.isort]
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "our-packages",
+    "first-party",
+    "local-folder",
+]
+sections = { our-packages = ["sentinelhub", "eolearn"] }
