@@ -6,7 +6,7 @@ How to run the notebooks:
 
 1. Clone the repository to your local machine.
 2. Install the requirements.
-3. Run the notebooks and feel free to explore more features on meteoblue Dataset API by editing them. 
+3. Run the notebooks and feel free to explore more features on meteoblue Dataset API by editing them.
 
 
 
