@@ -3,7 +3,7 @@ Module for basic feature manipulations, i.e. removing a feature from EOPatch, or
 the time-dependent features.
 
 Copyright (c) 2017- Sinergise and contributors
-For the full list of contributors, see the CREDITS file in the root directory of this source tree.
+For the full list of contributors, see https://github.com/sentinel-hub/eo-learn/blob/master/CREDITS.md.
 
 This source code is licensed under the MIT license, see the LICENSE file in the root directory of this source tree.
 """
