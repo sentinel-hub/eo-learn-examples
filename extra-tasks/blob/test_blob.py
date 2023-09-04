@@ -12,11 +12,12 @@ import os
 
 import numpy as np
 import pytest
-from blob import BlobTask
 from skimage.feature import blob_dog, blob_doh, blob_log
 
 from eolearn.core import EOPatch, FeatureType
 from sentinelhub.testing_utils import assert_statistics_match
+
+from .blob import BlobTask
 
 FEATURE = (FeatureType.DATA, "NDVI", "blob")
 BLOB_FEATURE = (FeatureType.DATA, "blob")
