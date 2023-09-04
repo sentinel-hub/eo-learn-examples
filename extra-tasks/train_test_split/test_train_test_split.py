@@ -11,11 +11,10 @@ from typing import Any
 import numpy as np
 import pytest
 from numpy.testing import assert_array_equal
+from train_test_split import TrainTestSplitTask, TrainTestSplitType
 
 from eolearn.core import EOPatch, FeatureType
 from eolearn.core.utils.testing import PatchGeneratorConfig, generate_eopatch
-
-from .train_test_split import TrainTestSplitTask, TrainTestSplitType
 
 INPUT_FEATURE = (FeatureType.MASK_TIMELESS, "TEST")
 OUTPUT_FEATURE = (FeatureType.MASK_TIMELESS, "TEST_TRAIN_MASK")
