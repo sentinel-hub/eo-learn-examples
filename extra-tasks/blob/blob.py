@@ -13,12 +13,9 @@ from math import sqrt
 from typing import Any, Callable
 
 import numpy as np
-import skimage.feature
 
 from eolearn.core import EOPatch, EOTask, FeatureType
-from eolearn.core.exceptions import EODeprecationWarning
 from eolearn.core.types import SingleFeatureSpec
-from sentinelhub.exceptions import deprecated_class
 
 
 class BlobTask(EOTask):
@@ -73,88 +70,3 @@ class BlobTask(EOTask):
             eopatch[ftype, new_fname] = self._compute_blob(eopatch[ftype, fname].astype(np.float64))
 
         return eopatch
-
-
-@deprecated_class(EODeprecationWarning, "Use `BlobTask` with `blob_object=skimage.feature.blob_dog`.")
-class DoGBlobTask(BlobTask):
-    """Task to compute blobs with Difference of Gaussian (DoG) method"""
-
-    def __init__(
-        self,
-        feature: SingleFeatureSpec,
-        *,
-        sigma_ratio: float = 1.6,
-        min_sigma: float = 1,
-        max_sigma: float = 30,
-        threshold: float = 0.1,
-        overlap: float = 0.5,
-        **kwargs: Any,
-    ):
-        super().__init__(
-            feature,
-            skimage.feature.blob_dog,
-            sigma_ratio=sigma_ratio,
-            min_sigma=min_sigma,
-            max_sigma=max_sigma,
-            threshold=threshold,
-            overlap=overlap,
-            **kwargs,
-        )
-
-
-@deprecated_class(EODeprecationWarning, "Use `BlobTask` with `blob_object=skimage.feature.blob_doh`.")
-class DoHBlobTask(BlobTask):
-    """Task to compute blobs with Determinant of the Hessian (DoH) method"""
-
-    def __init__(
-        self,
-        feature: SingleFeatureSpec,
-        *,
-        num_sigma: float = 10,
-        log_scale: bool = False,
-        min_sigma: float = 1,
-        max_sigma: float = 30,
-        threshold: float = 0.1,
-        overlap: float = 0.5,
-        **kwargs: Any,
-    ):
-        super().__init__(
-            feature,
-            skimage.feature.blob_doh,
-            num_sigma=num_sigma,
-            log_scale=log_scale,
-            min_sigma=min_sigma,
-            max_sigma=max_sigma,
-            threshold=threshold,
-            overlap=overlap,
-            **kwargs,
-        )
-
-
-@deprecated_class(EODeprecationWarning, "Use `BlobTask` with `blob_object=skimage.feature.blob_log`.")
-class LoGBlobTask(BlobTask):
-    """Task to compute blobs with Laplacian of Gaussian (LoG) method"""
-
-    def __init__(
-        self,
-        feature: SingleFeatureSpec,
-        *,
-        num_sigma: float = 10,
-        log_scale: bool = False,
-        min_sigma: float = 1,
-        max_sigma: float = 30,
-        threshold: float = 0.1,
-        overlap: float = 0.5,
-        **kwargs: Any,
-    ):
-        super().__init__(
-            feature,
-            skimage.feature.blob_log,
-            num_sigma=num_sigma,
-            log_scale=log_scale,
-            min_sigma=min_sigma,
-            max_sigma=max_sigma,
-            threshold=threshold,
-            overlap=overlap,
-            **kwargs,
-        )
