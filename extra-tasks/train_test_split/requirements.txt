@@ -1,0 +1,1 @@
+eo-learn[MLTOOLS]==1.5.0  # last tested version
