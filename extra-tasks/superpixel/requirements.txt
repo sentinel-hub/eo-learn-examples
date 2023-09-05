@@ -1,2 +1,2 @@
-eo-learn[FEATURES]==1.5.0  # last tested version
+eo-learn[GEOMETRY]==1.5.0  # last tested version
 scikit-image>=0.15
