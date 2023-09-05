@@ -1,0 +1,5 @@
+# using headless version of opencv, otherwise gitlab runners fail
+eo-learn[MASK]==1.5.0  # last tested version
+lightgbm>=2.0.11, <4
+scikit-image>=0.13.0
+sentinelhub
