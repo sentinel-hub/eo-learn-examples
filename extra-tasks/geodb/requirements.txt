@@ -1,0 +1,3 @@
+eo-learn[IO]==1.5.0  # last tested version
+python-dotenv
+xcube-geodb @ git+https://github.com/dcs4cop/xcube-geodb.git
