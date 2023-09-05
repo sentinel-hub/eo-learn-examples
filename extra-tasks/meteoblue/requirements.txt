@@ -1,0 +1,2 @@
+eo-learn[IO]==1.5.0  # last tested version
+meteoblue_dataset_sdk>=1,<2
