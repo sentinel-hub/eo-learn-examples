@@ -1,4 +1,4 @@
-FROM obarrilero/notebook:latest 
+FROM obarrilero/notebook:latest
 
 USER jovyan
 # Make sure the contents of our repo are in ${HOME}

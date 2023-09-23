@@ -37,21 +37,21 @@ Open a browser window at the address http://0.0.0.0:9005 or http://127.0.0.1:900
 
 ## About the hackathon
 
- ### Description: 
+ ### Description:
 
- 
+
  ### Tentative Agenda:
-     
 
- 
- 
- ### Requirements: 
+
+
+
+ ### Requirements:
  This [Binder](https://mybinder.readthedocs.io/en/latest/introduction.html#what-is-a-binder) repository was set up so that you can participate with no pre-requirement to be installed on your side.
  However, the notebook must target a computing environment with 2 GB of RAM. After some inactivity, the docker container is culled. Access to a web browser should be enough for your successful participation.
- 
- ### Target Participants: 
+
+ ### Target Participants:
  Students, Software developers, Data scientists, EO-developers, anyone with an interest in the topic.
- 
- ### Time requirements: 
- 
+
+ ### Time requirements:
+
  45 minutes
