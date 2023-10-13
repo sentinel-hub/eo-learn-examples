@@ -1,0 +1,11 @@
+pathlib
+datetime
+notebook
+aoihttp
+pandas>=0.23.1
+setuptools>=57.0.0
+scipy>=0.19
+matplotlib>=2.2.2
+seaborn>=0.9.0
+protobuf==3.20.0
+fs==2.4.14
