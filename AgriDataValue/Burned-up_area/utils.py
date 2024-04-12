@@ -82,7 +82,7 @@ class PatchToDataframeTask(EOTask):
             ts_array = np.full((time_dim, height, width), np.expand_dims(timestamp, axis=(-2, -1)))[..., mask].ravel()
             dataframe = pd.DataFrame(
                 {
-                    TIMESTAMP_COLUMN: pd.to_datetime(ts_array).normalize(),
+                    TIMESTAMP_COLUMN: pd.to_datetime(ts_array),
                     ID_X_COLUMN: np.full((time_dim, len(id_x)), id_x).ravel(),
                     ID_Y_COLUMN: np.full((time_dim, len(id_y)), id_y).ravel(),
                 }
