@@ -1,0 +1,33 @@
+{
+"type": "FeatureCollection",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "name": "Vilnius" }, "geometry": { "type": "Point", "coordinates": [ 25.261688, 54.684946997861104 ] } },
+{ "type": "Feature", "properties": { "name": "Luxembourg" }, "geometry": { "type": "Point", "coordinates": [ 6.13, 49.611659996798664 ] } },
+{ "type": "Feature", "properties": { "name": "Amsterdam" }, "geometry": { "type": "Point", "coordinates": [ 4.890444, 52.370196997443337 ] } },
+{ "type": "Feature", "properties": { "name": "Madrid" }, "geometry": { "type": "Point", "coordinates": [ -3.71666, 40.383332993344226 ] } },
+{ "type": "Feature", "properties": { "name": "Sofia" }, "geometry": { "type": "Point", "coordinates": [ 23.33333, 42.699999994391369 ] } },
+{ "type": "Feature", "properties": { "name": "Athens" }, "geometry": { "type": "Point", "coordinates": [ 23.716666, 37.966665992158354 ] } },
+{ "type": "Feature", "properties": { "name": "Stockholm" }, "geometry": { "type": "Point", "coordinates": [ 18.068611, 59.329439998431397 ] } },
+{ "type": "Feature", "properties": { "name": "Berlin" }, "geometry": { "type": "Point", "coordinates": [ 13.383333, 52.516665997472963 ] } },
+{ "type": "Feature", "properties": { "name": "Warsaw" }, "geometry": { "type": "Point", "coordinates": [ 21.01666, 52.233329997415282 ] } },
+{ "type": "Feature", "properties": { "name": "Bratislava" }, "geometry": { "type": "Point", "coordinates": [ 17.109722, 48.14388799638381 ] } },
+{ "type": "Feature", "properties": { "name": "Nicosia" }, "geometry": { "type": "Point", "coordinates": [ 33.36666, 35.166659990718962 ] } },
+{ "type": "Feature", "properties": { "name": "Brussels" }, "geometry": { "type": "Point", "coordinates": [ 4.35, 50.849999997109201 ] } },
+{ "type": "Feature", "properties": { "name": "Tallinn" }, "geometry": { "type": "Point", "coordinates": [ 24.745278, 59.437221998441302 ] } },
+{ "type": "Feature", "properties": { "name": "Bucharest" }, "geometry": { "type": "Point", "coordinates": [ 26.103888, 44.432499995101445 ] } },
+{ "type": "Feature", "properties": { "name": "Paris" }, "geometry": { "type": "Point", "coordinates": [ 2.3508, 48.856699996591779 ] } },
+{ "type": "Feature", "properties": { "name": "Budapest" }, "geometry": { "type": "Point", "coordinates": [ 19.050293, 47.494008996183503 ] } },
+{ "type": "Feature", "properties": { "name": "Copenhagen" }, "geometry": { "type": "Point", "coordinates": [ 12.568333, 55.676110998009861 ] } },
+{ "type": "Feature", "properties": { "name": "Dublin" }, "geometry": { "type": "Point", "coordinates": [ -6.259722, 53.347769997632476 ] } },
+{ "type": "Feature", "properties": { "name": "Helsinki" }, "geometry": { "type": "Point", "coordinates": [ 24.9375, 60.170832998505439 ] } },
+{ "type": "Feature", "properties": { "name": "Prague" }, "geometry": { "type": "Point", "coordinates": [ 14.41666, 50.083329996921123 ] } },
+{ "type": "Feature", "properties": { "name": "Lisbon" }, "geometry": { "type": "Point", "coordinates": [ -9.139444, 38.713888992533079 ] } },
+{ "type": "Feature", "properties": { "name": "Ljubljana" }, "geometry": { "type": "Point", "coordinates": [ 14.508333, 46.055549995703409 ] } },
+{ "type": "Feature", "properties": { "name": "Riga" }, "geometry": { "type": "Point", "coordinates": [ 24.106389, 56.94888799817759 ] } },
+{ "type": "Feature", "properties": { "name": "Zagreb" }, "geometry": { "type": "Point", "coordinates": [ 15.98333, 45.816659995618771 ] } },
+{ "type": "Feature", "properties": { "name": "Rome" }, "geometry": { "type": "Point", "coordinates": [ 12.5, 41.899999994041522 ] } },
+{ "type": "Feature", "properties": { "name": "Valletta" }, "geometry": { "type": "Point", "coordinates": [ 14.5125, 35.89776999109754 ] } },
+{ "type": "Feature", "properties": { "name": "Vienna" }, "geometry": { "type": "Point", "coordinates": [ 16.36666, 48.199999996400642 ] } }
+]
+}
