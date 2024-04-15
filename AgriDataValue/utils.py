@@ -249,6 +249,7 @@ def plot_comparison(
 
     plt.tight_layout(pad=0.4, w_pad=0.5, h_pad=2.0)
 
+
 def plot_image(
     image: np.ndarray, factor: float = 1.0, clip_range: tuple[float, float] | None = None, **kwargs: Any
 ) -> None:
