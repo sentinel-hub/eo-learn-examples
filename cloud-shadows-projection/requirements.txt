@@ -1,0 +1,8 @@
+eo-learn
+matplotlib
+numpy
+opencv-python-headless
+scikit-learn
+scipy
+shapely
+tqdm
