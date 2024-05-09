@@ -2,7 +2,6 @@ eo-learn[extra]
 matplotlib
 numpy
 opencv-python-headless
-scikit-learn
 scipy
 shapely
 tqdm
