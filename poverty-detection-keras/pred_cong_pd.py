@@ -4,6 +4,7 @@ pred_config.py
 
 List some configuration parameters for prediction
 """
+
 import os
 from os import path as op
 
