@@ -24,7 +24,7 @@ def dilate_mask(mask: np.ndarray, dilation_size: int) -> np.ndarray:
 def get_hillshade_mask(eop: EOPatch, t_idx: int, dilation_size: int) -> np.ndarray:
     """Calculates the hillshade mask for the given EOPatch and time index. The hillshade mask can be dilated."""
     dem_feature = (FeatureType.DATA_TIMELESS, "DEM")
-    height, width, _ = eop.get_spatial_dimension(*dem_feature)
+    height, width = eop.get_spatial_dimension(*dem_feature)
     resx, resy = bbox_to_resolution(eop.bbox, height=height, width=width)
 
     dem = eop[dem_feature].squeeze(-1)
@@ -86,3 +86,81 @@ def get_shadow_candidates(eop: EOPatch, t_idx: int, lum_perc_thr: float, min_siz
     raw_mask = lum_mask & filter_mask
     raw_mask = connected_components_filter(raw_mask, min_size)  # filter out small connected components
     return raw_mask > 0
+
+
+def project_cloud_mask(eop: EOPatch, t_idx: int, elevation: float) -> np.ndarray:
+    """Projects the cloud mask to the ground level assuming some cloud height and using the sun and view angles."""
+
+    # calculate the image resolution
+    dem_feature = (FeatureType.DATA_TIMELESS, "DEM")
+    h, w = eop.get_spatial_dimension(*dem_feature)
+    resx, resy = bbox_to_resolution(eop.bbox, height=h, width=w)
+
+    # load the necessary data
+    clm = eop[(FeatureType.MASK, "CLM")][t_idx].squeeze(-1) == 1
+    hsm = eop[(FeatureType.MASK, "HSM")][t_idx].squeeze(-1)
+    valid = eop[(FeatureType.MASK, "dataMask")][t_idx].squeeze(-1)
+
+    # obtain the solar and view angles
+    mask = clm & valid & ~hsm
+    sZ = eop.data["sunZenithAngles"][t_idx].squeeze(-1)[mask] * np.pi / 180
+    sA = eop.data["sunAzimuthAngles"][t_idx].squeeze(-1)[mask] * np.pi / 180
+    vZ = eop.data["viewZenithMean"][t_idx].squeeze(-1)[mask] * np.pi / 180
+    vA = eop.data["viewAzimuthMean"][t_idx].squeeze(-1)[mask] * np.pi / 180
+    sZ, sA, vZ, vA = list(map(np.nanmean, [sZ, sA, vZ, vA]))  # calculate the average
+
+    # get pixel indices of the cloud mask and convert them to CRS coordinates
+    rows_c, cols_c = np.where(mask)
+    xmin, _ = eop.bbox.lower_left
+    _, ymax = eop.bbox.upper_right
+    xc = xmin + cols_c * resx
+    yc = ymax - rows_c * resy
+
+    # project the cloud mask to the ground level in CRS coordinates
+    xs = xc - elevation * (-np.tan(vZ) * np.sin(vA) + np.tan(sZ) * np.sin(sA))
+    ys = yc - elevation * (np.tan(vZ) * np.cos(vA) + np.tan(sZ) * np.cos(sA))
+
+    # filter out NaN values
+    nan_mask = np.isnan(xs) | np.isnan(ys)
+    xc, yc, xs, ys = [array[~nan_mask] for array in [xc, yc, xs, ys]]
+
+    # convert the CRS coordinates back to pixel indices
+    cols_s = (np.round(xs - xmin, decimals=-1) / resx).astype(int)
+    rows_s = (np.round(ymax - ys, decimals=-1) / resy).astype(int)
+
+    # filter out-of-bounds values
+    out_of_bounds = (cols_s < 0) | (cols_s >= w) | (rows_s < 0) | (rows_s >= h)
+    cols_s = cols_s[~out_of_bounds]
+    rows_s = rows_s[~out_of_bounds]
+
+    # create the cloud shadow mask
+    shadow_mask = np.zeros_like(mask)
+    shadow_mask[(rows_s, cols_s)] = 1
+    shadow_mask[~valid] = 0
+
+    return (
+        shadow_mask & ~clm & valid,  # remove clouds and invalid pixels
+        (np.round(xs[0] - xc[0], decimals=-1) / resx).astype(int),  # projection offset in x
+        (np.round(ys[0] - yc[0], decimals=-1) / resy).astype(int),  # projection offset in y
+    )
+
+
+def iou(a: np.ndarray, b: np.ndarray) -> float:
+    """Calculates the intersection over union between two binary masks."""
+    return np.count_nonzero(a & b) / np.count_nonzero(a | b)
+
+
+def get_edge_mask(cols_off: int, rows_off: int, shape: tuple[int, int]) -> np.ndarray:
+    """Function to get the edge area of the mask after projection"""
+    edge_offset_mask = np.zeros(shape, dtype=bool)
+    if cols_off > 0:
+        edge_offset_mask[:, :cols_off] = True
+    else:
+        edge_offset_mask[:, cols_off:] = True
+
+    if rows_off > 0:
+        edge_offset_mask[-rows_off:] = True
+    else:
+        edge_offset_mask[:-rows_off] = True
+
+    return edge_offset_mask
