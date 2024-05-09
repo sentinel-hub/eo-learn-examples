@@ -6,6 +6,7 @@ For the full list of contributors, see https://github.com/sentinel-hub/eo-learn/
 
 This source code is licensed under the MIT license, see the LICENSE file in the root directory of this source tree.
 """
+
 from __future__ import annotations
 
 import numpy as np
