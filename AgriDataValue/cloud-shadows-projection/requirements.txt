@@ -1,0 +1,7 @@
+eo-learn[extra]
+matplotlib
+numpy
+opencv-python-headless
+scipy
+shapely
+tqdm
