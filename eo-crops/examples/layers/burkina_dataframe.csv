@@ -1,0 +1,193 @@
+Aggregation,Annee,Variable,Id_location,Latitude,Longitude
+cumul,2010,RG,200026,14.0333,-0.0333
+mean,2010,Wind,200026,14.0333,-0.0333
+cumul,2010,Precipitation,200026,14.0333,-0.0333
+min,2010,Min Temperature,200026,14.0333,-0.0333
+mean,2010,Mean Temperature,200026,14.0333,-0.0333
+max,2010,Max Temperature,200026,14.0333,-0.0333
+cumul,2010,RG,200107,11.7333,-2.9167
+mean,2010,Wind,200107,11.7333,-2.9167
+cumul,2010,Precipitation,200107,11.7333,-2.9167
+min,2010,Min Temperature,200107,11.7333,-2.9167
+mean,2010,Mean Temperature,200107,11.7333,-2.9167
+max,2010,Max Temperature,200107,11.7333,-2.9167
+cumul,2010,RG,200140,10.3333,-3.1833
+mean,2010,Wind,200140,10.3333,-3.1833
+cumul,2010,Precipitation,200140,10.3333,-3.1833
+min,2010,Min Temperature,200140,10.3333,-3.1833
+mean,2010,Mean Temperature,200140,10.3333,-3.1833
+max,2010,Max Temperature,200140,10.3333,-3.1833
+cumul,2010,RG,200099,11.1667,-4.3
+mean,2010,Wind,200099,11.1667,-4.3
+cumul,2010,Precipitation,200099,11.1667,-4.3
+min,2010,Min Temperature,200099,11.1667,-4.3
+mean,2010,Mean Temperature,200099,11.1667,-4.3
+max,2010,Max Temperature,200099,11.1667,-4.3
+cumul,2010,RG,200089,12.0667,0.35
+mean,2010,Wind,200089,12.0667,0.35
+cumul,2010,Precipitation,200089,12.0667,0.35
+min,2010,Min Temperature,200089,12.0667,0.35
+mean,2010,Mean Temperature,200089,12.0667,0.35
+max,2010,Max Temperature,200089,12.0667,0.35
+cumul,2010,RG,200133,11.25,0.7
+mean,2010,Wind,200133,11.25,0.7
+cumul,2010,Precipitation,200133,11.25,0.7
+min,2010,Min Temperature,200133,11.25,0.7
+mean,2010,Mean Temperature,200133,11.25,0.7
+max,2010,Max Temperature,200133,11.25,0.7
+cumul,2010,RG,200125,11.4833,-3.5167
+mean,2010,Wind,200125,11.4833,-3.5167
+cumul,2010,Precipitation,200125,11.4833,-3.5167
+min,2010,Min Temperature,200125,11.4833,-3.5167
+mean,2010,Mean Temperature,200125,11.4833,-3.5167
+max,2010,Max Temperature,200125,11.4833,-3.5167
+cumul,2010,RG,200001,12.35,-2.1833
+mean,2010,Wind,200001,12.35,-2.1833
+cumul,2010,Precipitation,200001,12.35,-2.1833
+min,2010,Min Temperature,200001,12.35,-2.1833
+mean,2010,Mean Temperature,200001,12.35,-2.1833
+max,2010,Max Temperature,200001,12.35,-2.1833
+cumul,2011,RG,200026,14.0333,-0.0333
+mean,2011,Wind,200026,14.0333,-0.0333
+cumul,2011,Precipitation,200026,14.0333,-0.0333
+min,2011,Min Temperature,200026,14.0333,-0.0333
+mean,2011,Mean Temperature,200026,14.0333,-0.0333
+max,2011,Max Temperature,200026,14.0333,-0.0333
+cumul,2011,RG,200107,11.7333,-2.9167
+mean,2011,Wind,200107,11.7333,-2.9167
+cumul,2011,Precipitation,200107,11.7333,-2.9167
+min,2011,Min Temperature,200107,11.7333,-2.9167
+mean,2011,Mean Temperature,200107,11.7333,-2.9167
+max,2011,Max Temperature,200107,11.7333,-2.9167
+cumul,2011,RG,200140,10.3333,-3.1833
+mean,2011,Wind,200140,10.3333,-3.1833
+cumul,2011,Precipitation,200140,10.3333,-3.1833
+min,2011,Min Temperature,200140,10.3333,-3.1833
+mean,2011,Mean Temperature,200140,10.3333,-3.1833
+max,2011,Max Temperature,200140,10.3333,-3.1833
+cumul,2011,RG,200099,11.1667,-4.3
+mean,2011,Wind,200099,11.1667,-4.3
+cumul,2011,Precipitation,200099,11.1667,-4.3
+min,2011,Min Temperature,200099,11.1667,-4.3
+mean,2011,Mean Temperature,200099,11.1667,-4.3
+max,2011,Max Temperature,200099,11.1667,-4.3
+cumul,2011,RG,200089,12.0667,0.35
+mean,2011,Wind,200089,12.0667,0.35
+cumul,2011,Precipitation,200089,12.0667,0.35
+min,2011,Min Temperature,200089,12.0667,0.35
+mean,2011,Mean Temperature,200089,12.0667,0.35
+max,2011,Max Temperature,200089,12.0667,0.35
+cumul,2011,RG,200133,11.25,0.7
+mean,2011,Wind,200133,11.25,0.7
+cumul,2011,Precipitation,200133,11.25,0.7
+min,2011,Min Temperature,200133,11.25,0.7
+mean,2011,Mean Temperature,200133,11.25,0.7
+max,2011,Max Temperature,200133,11.25,0.7
+cumul,2011,RG,200125,11.4833,-3.5167
+mean,2011,Wind,200125,11.4833,-3.5167
+cumul,2011,Precipitation,200125,11.4833,-3.5167
+min,2011,Min Temperature,200125,11.4833,-3.5167
+mean,2011,Mean Temperature,200125,11.4833,-3.5167
+max,2011,Max Temperature,200125,11.4833,-3.5167
+cumul,2011,RG,200001,12.35,-2.1833
+mean,2011,Wind,200001,12.35,-2.1833
+cumul,2011,Precipitation,200001,12.35,-2.1833
+min,2011,Min Temperature,200001,12.35,-2.1833
+mean,2011,Mean Temperature,200001,12.35,-2.1833
+max,2011,Max Temperature,200001,12.35,-2.1833
+cumul,2012,RG,200026,14.0333,-0.0333
+mean,2012,Wind,200026,14.0333,-0.0333
+cumul,2012,Precipitation,200026,14.0333,-0.0333
+min,2012,Min Temperature,200026,14.0333,-0.0333
+mean,2012,Mean Temperature,200026,14.0333,-0.0333
+max,2012,Max Temperature,200026,14.0333,-0.0333
+cumul,2012,RG,200107,11.7333,-2.9167
+mean,2012,Wind,200107,11.7333,-2.9167
+cumul,2012,Precipitation,200107,11.7333,-2.9167
+min,2012,Min Temperature,200107,11.7333,-2.9167
+mean,2012,Mean Temperature,200107,11.7333,-2.9167
+max,2012,Max Temperature,200107,11.7333,-2.9167
+cumul,2012,RG,200140,10.3333,-3.1833
+mean,2012,Wind,200140,10.3333,-3.1833
+cumul,2012,Precipitation,200140,10.3333,-3.1833
+min,2012,Min Temperature,200140,10.3333,-3.1833
+mean,2012,Mean Temperature,200140,10.3333,-3.1833
+max,2012,Max Temperature,200140,10.3333,-3.1833
+cumul,2012,RG,200099,11.1667,-4.3
+mean,2012,Wind,200099,11.1667,-4.3
+cumul,2012,Precipitation,200099,11.1667,-4.3
+min,2012,Min Temperature,200099,11.1667,-4.3
+mean,2012,Mean Temperature,200099,11.1667,-4.3
+max,2012,Max Temperature,200099,11.1667,-4.3
+cumul,2012,RG,200089,12.0667,0.35
+mean,2012,Wind,200089,12.0667,0.35
+cumul,2012,Precipitation,200089,12.0667,0.35
+min,2012,Min Temperature,200089,12.0667,0.35
+mean,2012,Mean Temperature,200089,12.0667,0.35
+max,2012,Max Temperature,200089,12.0667,0.35
+cumul,2012,RG,200133,11.25,0.7
+mean,2012,Wind,200133,11.25,0.7
+cumul,2012,Precipitation,200133,11.25,0.7
+min,2012,Min Temperature,200133,11.25,0.7
+mean,2012,Mean Temperature,200133,11.25,0.7
+max,2012,Max Temperature,200133,11.25,0.7
+cumul,2012,RG,200125,11.4833,-3.5167
+mean,2012,Wind,200125,11.4833,-3.5167
+cumul,2012,Precipitation,200125,11.4833,-3.5167
+min,2012,Min Temperature,200125,11.4833,-3.5167
+mean,2012,Mean Temperature,200125,11.4833,-3.5167
+max,2012,Max Temperature,200125,11.4833,-3.5167
+cumul,2012,RG,200001,12.35,-2.1833
+mean,2012,Wind,200001,12.35,-2.1833
+cumul,2012,Precipitation,200001,12.35,-2.1833
+min,2012,Min Temperature,200001,12.35,-2.1833
+mean,2012,Mean Temperature,200001,12.35,-2.1833
+max,2012,Max Temperature,200001,12.35,-2.1833
+cumul,2013,RG,200026,14.0333,-0.0333
+mean,2013,Wind,200026,14.0333,-0.0333
+cumul,2013,Precipitation,200026,14.0333,-0.0333
+min,2013,Min Temperature,200026,14.0333,-0.0333
+mean,2013,Mean Temperature,200026,14.0333,-0.0333
+max,2013,Max Temperature,200026,14.0333,-0.0333
+cumul,2013,RG,200107,11.7333,-2.9167
+mean,2013,Wind,200107,11.7333,-2.9167
+cumul,2013,Precipitation,200107,11.7333,-2.9167
+min,2013,Min Temperature,200107,11.7333,-2.9167
+mean,2013,Mean Temperature,200107,11.7333,-2.9167
+max,2013,Max Temperature,200107,11.7333,-2.9167
+cumul,2013,RG,200140,10.3333,-3.1833
+mean,2013,Wind,200140,10.3333,-3.1833
+cumul,2013,Precipitation,200140,10.3333,-3.1833
+min,2013,Min Temperature,200140,10.3333,-3.1833
+mean,2013,Mean Temperature,200140,10.3333,-3.1833
+max,2013,Max Temperature,200140,10.3333,-3.1833
+cumul,2013,RG,200099,11.1667,-4.3
+mean,2013,Wind,200099,11.1667,-4.3
+cumul,2013,Precipitation,200099,11.1667,-4.3
+min,2013,Min Temperature,200099,11.1667,-4.3
+mean,2013,Mean Temperature,200099,11.1667,-4.3
+max,2013,Max Temperature,200099,11.1667,-4.3
+cumul,2013,RG,200089,12.0667,0.35
+mean,2013,Wind,200089,12.0667,0.35
+cumul,2013,Precipitation,200089,12.0667,0.35
+min,2013,Min Temperature,200089,12.0667,0.35
+mean,2013,Mean Temperature,200089,12.0667,0.35
+max,2013,Max Temperature,200089,12.0667,0.35
+cumul,2013,RG,200133,11.25,0.7
+mean,2013,Wind,200133,11.25,0.7
+cumul,2013,Precipitation,200133,11.25,0.7
+min,2013,Min Temperature,200133,11.25,0.7
+mean,2013,Mean Temperature,200133,11.25,0.7
+max,2013,Max Temperature,200133,11.25,0.7
+cumul,2013,RG,200125,11.4833,-3.5167
+mean,2013,Wind,200125,11.4833,-3.5167
+cumul,2013,Precipitation,200125,11.4833,-3.5167
+min,2013,Min Temperature,200125,11.4833,-3.5167
+mean,2013,Mean Temperature,200125,11.4833,-3.5167
+max,2013,Max Temperature,200125,11.4833,-3.5167
+cumul,2013,RG,200001,12.35,-2.1833
+mean,2013,Wind,200001,12.35,-2.1833
+cumul,2013,Precipitation,200001,12.35,-2.1833
+min,2013,Min Temperature,200001,12.35,-2.1833
+mean,2013,Mean Temperature,200001,12.35,-2.1833
+max,2013,Max Temperature,200001,12.35,-2.1833

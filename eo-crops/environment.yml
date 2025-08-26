@@ -1,0 +1,21 @@
+name: eo-crops
+channels:
+  - conda-forge
+dependencies:
+  - python=3.7
+  - pip
+  - gdal
+  - pip :
+      - eo-learn-coregistration
+      - eo-learn-features
+      - eo-learn-mask
+      - eo-learn-visualization
+      - eo-learn-ml-tools
+      - eo-learn-core
+      - eo-learn-io
+      - eo-learn-geometry
+      - sentinelhub
+      - -r requirements.txt
+
+
+
